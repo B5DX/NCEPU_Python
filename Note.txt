@@ -1,0 +1,33 @@
+dict1.items()
+
+map()
+filter()
+
+*args, **kwargs解引用
+
+lambda表达式：
+与常规函数区别
+　　匿名函数 lambda 和常规函数一样，返回的都是一个函数对象（function object) 
+　　lambda 是一个表达式（expression），并不是一个语句（statement）。
+       表达式是可以被求值,类似"公式"的代码，而语句是一段完成了某种功能的可执行代码。
+　　所以,lambda可以用在列表内部:
+li = [(lambda x:x**2) (x) for x in range(10)]
+print(list(li))
+[0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+　　同样,可以作为参数
+l = [(1, 20), (3, 0), (9, 10), (2, -1)]
+l.sort(key=lambda x: x[1]) # 按列表中元祖的第二个元素排序
+print(l)
+输出
+[(2, -1), (3, 0), (9, 10), (1, 20)]
+lambda 的主体是只有一行的简单表达式，并不能扩展成一个多行的代码块。
+回到顶部
+使用lambda可以简化代码
+squared = map(lambda x: x**2, [1, 2, 3, 4, 5])
+print(list(squared))
+　　上面那段代码，如果不用lambda表达式而用常规函数:
+def squared2(x):
+    return x[1] if isinstance(x,tuple) else x**2
+
+squared = map(squared2, [1, 2, 3, 4, 5,(1,3)])
+print(list(squared))
