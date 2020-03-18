@@ -58,7 +58,7 @@ def readText():
     # with open(pwd + '.\\3_18.txt', 'rb', encoding='utf-8') as fromFile:
     #     with open(pwd + '.\\3_18_copy.txt', 'wb', encoding='utf-8') as targetFile:
     #         targetFile.write(fromFile.read())
-    lines[1:] = sorted(lines[1:], key=lambda line: line[2])
+    lines[1:] = sorted(lines[1:], key=lambda line: line[2], reverse=True)
 
     with open(pwd + '\\3_18_out.txt', 'w', encoding='utf-8') as f:
         for curline in lines:
