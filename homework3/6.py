@@ -13,8 +13,8 @@ def readFiles() -> (str, str) :
             cmp2 = f.read()
     except FileExistsError:
         print(FileExistsError.args)
-    else:
-        print('Read sucessfully')
+    # else:
+    #     print('Read sucessfully')
     return (cmp1, cmp2)
 
 def buildDict(wordList: list) -> dict :
@@ -26,12 +26,6 @@ def buildDict(wordList: list) -> dict :
         else :
             dic[word] = 1
     return dic
-
-def calculateRepeatability(sortedList1, sortedList2) -> float:
-    set1 = set(sortedList1[0:10])
-    set2 = set(sortedList2[0:10])
-    intersection = set1 & set2
-    return len(intersection) / 10
 
 if __name__ == "__main__":
     os.chdir(os.path.dirname(__file__))
@@ -56,5 +50,19 @@ if __name__ == "__main__":
 
     # for i in range(10):
     #     print(sortedDic1[i], str(dict1[sortedDic1[i]]), '|', sortedDic2[i], str(dict2[sortedDic2[i]]))
+    try:
+        length = 10
+        set1 = set(sortedDic1[0:length])
+        set2 = set(sortedDic2[0:length])
+        intersection = set1 & set2
+        rate = len(intersection) / length
 
-    print('Repeatibility: {0: .2f}%'.format(calculateRepeatability(sortedDic1, sortedDic2) * 100))
+        with open('cmpResult.txt', 'w') as f:
+            for i in intersection:
+                print(i)
+                f.write(i+'\n')
+            res = 'Repeatibility: {0: .2f}%'.format(rate * 100)
+            print(res)
+            f.write(res)
+    except IndexError:
+        print('please minus length.')
