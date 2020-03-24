@@ -1,0 +1,10 @@
+NO: 8, Name: h, Score: 74
+NO: 6, Name: f, Score: 55
+NO: 4, Name: d, Score: 80
+NO: 5, Name: e, Score: 59
+NO: 9, Name: i, Score: 92
+NO: 3, Name: c, Score: 53
+NO: 1, Name: a, Score: 72
+NO: 2, Name: b, Score: 80
+NO: 7, Name: g, Score: 78
+NO: 10, Name: j, Score: 56
