@@ -8,5 +8,5 @@ def generateFiles(sum: int) -> None:
 if __name__ == "__main__":
     assert 'homework' in __file__
     os.chdir(os.path.dirname(__file__))
-    generateFiles(8)
+    generateFiles(6)
     print('Finish')
