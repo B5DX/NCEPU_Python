@@ -12,12 +12,12 @@ class Student:
             raise Exception('Duplicated Main Key(num)')
             return
         self.__cls = cls
-        self.__num = num
+        self.__num = str(num)
         self.__name = name
         self.__grade = {
             'Python': int(grade)
         }
-        if args == None: # normal create (else for load data)
+        if len(args) == 0: # normal create (else for load data)
             Student.__stuList.append(self)
             Student.__nums.append(num)
         
@@ -65,7 +65,7 @@ class Student:
         if os.path.exists('stuInfo.data'):
             with open('stuInfo.data', 'rb') as f:
                 num = pk.load(f)
-                # print(num)
+                print(num, 'students totoal')
                 for i in range(num):
                     L = []
                     for i in range(3):
@@ -73,6 +73,7 @@ class Student:
                     s = Student(*L, 0, False)
                     s.__setGrade(pk.load(f))
                     cls.__stuList.append(s)
+                    cls.__nums.append(s.getNum())
 
     @classmethod
     def addStu(cls):
@@ -114,6 +115,7 @@ if __name__ == "__main__":
         testInput()
         Student.load()
         s = Student.findStudent('120192020303')
+    # s1 = Student('nb', '233', 'wjc', 99)
     while True:
         op = input(f'Current Student: {s.getName()}, num: {s.getNum()}\n\
 Input operation: addGrade, delGrade, chGrade, getGrade, CS(change student) or exit:\n')
