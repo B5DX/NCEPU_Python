@@ -104,8 +104,6 @@ def testInput():
         for i in L:
             pk.dump(i, f) # pickle can automatically split different varibles
 
-
-
 if __name__ == "__main__":
     os.chdir(os.path.dirname(__file__))
     # testInput()
