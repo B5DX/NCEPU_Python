@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File "F:/Py Project/Learn/NCEPU_Python/exercise/5_6.py", line 23, in <module>
+    cursor.execute(sql)
+  File "F:\Py Project\Learn\NCEPU_Python\venv\lib\site-packages\pymysql\cursors.py", line 170, in execute
+    result = self._query(query)
+  File "F:\Py Project\Learn\NCEPU_Python\venv\lib\site-packages\pymysql\cursors.py", line 328, in _query
+    conn.query(q)
+  File "F:\Py Project\Learn\NCEPU_Python\venv\lib\site-packages\pymysql\connections.py", line 517, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+  File "F:\Py Project\Learn\NCEPU_Python\venv\lib\site-packages\pymysql\connections.py", line 732, in _read_query_result
+    result.read()
+  File "F:\Py Project\Learn\NCEPU_Python\venv\lib\site-packages\pymysql\connections.py", line 1075, in read
+    first_packet = self.connection._read_packet()
+  File "F:\Py Project\Learn\NCEPU_Python\venv\lib\site-packages\pymysql\connections.py", line 684, in _read_packet
+    packet.check_error()
+  File "F:\Py Project\Learn\NCEPU_Python\venv\lib\site-packages\pymysql\protocol.py", line 220, in check_error
+    err.raise_mysql_exception(self._data)
+  File "F:\Py Project\Learn\NCEPU_Python\venv\lib\site-packages\pymysql\err.py", line 109, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.IntegrityError: (1062, "Duplicate entry '1' for key 'user.PRIMARY'")

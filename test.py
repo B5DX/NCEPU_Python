@@ -24,7 +24,7 @@ def main():
     pw = Process(target=write, args=(q,))
     pr = Process(target=read, args=(q,))
     # 启动子进程pw，写入:
-    pw.start()    
+    pw.start()
     # 等待pw结束:
     pw.join()
     # 启动子进程pr，读取:
