@@ -72,14 +72,18 @@ class SQL:
         self.__session.commit()
 
     def search(self, id=None, name=None):
-        session = self.__session
-        if isinstance(id, int):
-            res =  session.query(Message).filter(Message.id==id).all()
-        elif isinstance(name, str):
-            res =  session.query(Message).filter(Message.name==name).all()
-        else:
-            res =  session.query(Message).all()
-        return res
+        try:
+            session = self.__session
+            if isinstance(id, int):
+                res =  session.query(Message).filter(Message.id==id).all()
+            elif isinstance(name, str):
+                res =  session.query(Message).filter(Message.name==name).all()
+            else:
+                res =  session.query(Message).all()
+            return res
+        except Exception as e:
+            print('search failed.')
+            return []
 
     @decorator
     def update(self, id, new_content, new_time):
