@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>UserList</title>
+</head>
+<body>
+
+<table border="2" align="center">
+    <tr>
+        <td>Name</td>
+        <td>Content</td>
+        <td>time</td>
+    </tr>
+    {% for i in usr_list%}
+    <tr>
+        <td>{{i[0]}}</td>
+        <td>{{i[1]}}</td>
+        <td>{{i[2]}}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>
