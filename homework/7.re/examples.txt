@@ -1,0 +1,2385 @@
+Example 1
+Project: keras-anomaly-detection	Author: chen0040	File: plot_utils.py	
+def visualize_anomaly(y_true, reconstruction_error, threshold):
+    error_df = pd.DataFrame({'reconstruction_error': reconstruction_error,
+                             'true_class': y_true})
+    print(error_df.describe())
+
+    groups = error_df.groupby('true_class')
+    fig, ax = plt.subplots()
+
+    for name, group in groups:
+        ax.plot(group.index, group.reconstruction_error, marker='o', ms=3.5, linestyle='',
+                label="Fraud" if name == 1 else "Normal")
+
+    ax.hlines(threshold, ax.get_xlim()[0], ax.get_xlim()[1], colors="r", zorder=100, label='Threshold')
+    ax.legend()
+    plt.title("Reconstruction error for different classes")
+    plt.ylabel("Reconstruction error")
+    plt.xlabel("Data point index")
+    plt.show() 
+***************************************
+Example 2
+Project: s2g	Author: caesar0301	File: test.py	
+def test_point_projects_to_edge(self):
+        # p = (114.83299055, 26.8892277)
+        p = (121.428387, 31.027371)
+        a = time.time()
+        edges, segments = self.sg.point_projects_to_edges(p, 0.01)
+        print(time.time() - a)
+
+        if self.show_plots:
+            plt.figure()
+            s2g.plot_lines(MultiLineString(segments), color='orange')  # original roads
+            for i in range(0, len(edges)):
+                s, e = edges[i]
+                sxy = self.sg.node_xy[s]
+                exy = self.sg.node_xy[e]
+                plt.plot([sxy[0], exy[0]], [sxy[1], exy[1]], color='green')  # graph edges
+            plt.plot(p[0], p[1], color='red', markersize=12, marker='o')  # bridges
+            plt.show() 
+***************************************
+Example 3
+Project: PEAKachu	Author: tbischler	File: window.py	
+def _plot_and_write_windows_gfold(self):
+        # plot windows
+        print("* Plotting normalized windows...", flush=True)
+        t_start = time()
+        sig_window_df = self._window_df[self._window_df.significant]
+        unsig_window_df = self._initial_window_df[
+            ~self._initial_window_df.index.isin(sig_window_df.index)]
+        self._plot_initial_windows(unsig_window_df.base_means,
+                                   unsig_window_df.fold_change,
+                                   sig_window_df.base_means,
+                                   sig_window_df.fold_change)
+        t_end = time()
+        print("Plotting took {} seconds.".format(t_end-t_start), flush=True)
+        # write windows after prefiltering with test results
+        self._window_df.to_csv(
+            "{}/windows_after_prefiltering.csv".format(self._output_folder),
+            sep='\t', index=False, encoding='utf-8') 
+***************************************
+Example 4
+Project: PEAKachu	Author: tbischler	File: window.py	
+def _plot_initial_windows(self, unsig_base_means, unsig_fcs,
+                              sig_base_means, sig_fcs):
+        # create plot folder if it does not exist
+        plot_folder = "{}/plots".format(self._output_folder)
+        if not exists(plot_folder):
+            makedirs(plot_folder)
+        # MA plot
+        plt.plot(np.log10(unsig_base_means),
+                 np.log2(unsig_fcs), ".",
+                 markersize=2.0, alpha=0.3)
+        plt.plot(np.log10(sig_base_means),
+                 np.log2(sig_fcs), ".",
+                 markersize=2.0, color="red", alpha=0.3)
+        plt.axhline(y=np.median(np.log2(unsig_fcs.append(sig_fcs))))
+        plt.axvline(x=np.median(np.log10(unsig_base_means.append(
+                                         sig_base_means))))
+        plt.title("Initial_windows_MA_plot")
+        plt.xlabel("log10 base mean")
+        plt.ylabel("log2 fold-change")
+        plt.savefig("{}/Initial_windows_MA_plot.png".format(plot_folder),
+                    dpi=600)
+        plt.close()
+        # HexBin plot
+        df = pd.DataFrame({'log10 base mean': np.log10(unsig_base_means.append(
+            sig_base_means)), 'log2 fold-change': np.log2(unsig_fcs.append(
+                sig_fcs))})
+        df.plot(kind='hexbin', x='log10 base mean',
+                y='log2 fold-change', gridsize=50, bins='log')
+        plt.axhline(y=np.median(np.log2(unsig_fcs.append(sig_fcs))))
+        plt.axvline(x=np.median(np.log10(unsig_base_means.append(
+                                         sig_base_means))))
+        plt.title("Initial_windows_HexBin_plot")
+        plt.savefig("{}/Initial_windows_HexBin_plot.pdf".format(plot_folder))
+        plt.close() 
+***************************************
+Example 5
+Project: PEAKachu	Author: tbischler	File: window.py	
+def _plot_and_write_windows_deseq(self):
+        # plot windows
+        print("* Plotting normalized windows...", flush=True)
+        t_start = time()
+        sig_window_df = self._window_df[self._window_df.significant]
+        unsig_window_df = self._window_df[
+            ~self._window_df.index.isin(sig_window_df.index)]
+        self._plot_initial_windows(
+            unsig_window_df.baseMean,
+            np.power(2.0, unsig_window_df.log2FoldChange),
+            sig_window_df.baseMean,
+            np.power(2.0, sig_window_df.log2FoldChange))
+        t_end = time()
+        print("Plotting took {} seconds.".format(t_end-t_start), flush=True)
+        # write windows after prefiltering with test results
+        self._window_df.to_csv(
+            "{}/windows_after_prefiltering.csv".format(self._output_folder),
+            sep='\t', index=False, encoding='utf-8') 
+***************************************
+Example 6
+Project: kicker-module	Author: EvanTheB	File: graph.py	
+def graph_ranks(p, g, ladder):
+    def get_names_ranks(data):
+        ret = []
+        for l in data:
+            if float(l.extra[2][1]) > 7.:
+                ret.append((l[1], len(data)))
+            else:
+                ret.append((l.name, l.rank))
+        return ret
+
+    graph_data = []
+    for i in range(1, len(g) + 1):
+        data = ladder.process(p, g[0:i])
+        graph_data.append(get_names_ranks(data))
+
+    for y in data_to_yarr(graph_data):
+        plt.plot(y)
+    pylab.savefig('graph_ranks.svg')
+    #plt.show() 
+***************************************
+Example 7
+Project: kicker-module	Author: EvanTheB	File: graph.py	
+def graph_level(p, g, ladder):
+    def get_names_lvl(data):
+        ret = []
+        for l in data:
+            ret.append((l.name, l.extra[0][1]))
+        return ret
+
+    graph_data = []
+    for i in range(1, len(g) + 1):
+        data = ladder.process(p, g[0:i])
+        graph_data.append(get_names_lvl(data))
+
+    for y in data_to_yarr(graph_data):
+        plt.plot(y)
+    pylab.savefig('graph_level.svg')
+   # plt.show() 
+***************************************
+Example 8
+Project: kicker-module	Author: EvanTheB	File: graph.py	
+def graph_skill(p, g, ladder):
+    def get_names_skill(data):
+        ret = []
+        for l in data:
+            if float(l.extra[2][1]) > 7.:
+                ret.append((l.name, 0.))
+            else:
+                ret.append((l.name, l.extra[1][1]))
+        return ret
+
+    graph_data = []
+    for i in range(1, len(g) + 1):
+        data = ladder.process(p, g[0:i])
+        graph_data.append(get_names_skill(data))
+
+    for y in data_to_yarr(graph_data):
+        plt.plot(y)
+    pylab.savefig('graph_skill.svg')
+  #  plt.show() 
+***************************************
+Example 9
+Project: OpenAPS	Author: medicinexlab	File: oldpred.py	
+def _get_old_pred(bg_df, start_index, end_index, num_pred_minutes):
+    #The number of 5 minute sections until the prediction (e.g. 30 minutes = 6 sections)
+    pred_array_index = num_pred_minutes / DATA_SPACING
+
+    actual_bg_array, actual_bg_time_array, eventual_pred_array, eventual_pred_time_array, iob_pred_array, iob_pred_time_array, cob_pred_array, cob_pred_time_array, acob_pred_array, acob_pred_time_array = _get_raw_pred_array(bg_df, start_index, end_index, pred_array_index)
+
+    eventual_pred_data = _find_compare_array(actual_bg_array, actual_bg_time_array, eventual_pred_array, eventual_pred_time_array, 30)
+    iob_pred_data = _find_compare_array(actual_bg_array, actual_bg_time_array, iob_pred_array, iob_pred_time_array, num_pred_minutes)
+    cob_pred_data= _find_compare_array(actual_bg_array, actual_bg_time_array, cob_pred_array, cob_pred_time_array, num_pred_minutes)
+    acob_pred_data = _find_compare_array(actual_bg_array, actual_bg_time_array, acob_pred_array, acob_pred_time_array, num_pred_minutes)
+
+    return eventual_pred_data, iob_pred_data, cob_pred_data, acob_pred_data
+
+
+#Plots old pred data given namedtuple of old data (eventualBG, acob, cob, or iob).
+#Can show or save prediction plot based on show_pred_plot or save_pred_plot, respectively.
+#Same goes for the Clarke Error grid with show_clarke_plot or save_clarke_plot, respectively.
+#id_str, algorithm_str, minutes_str are strings of the ID, the prediction algorithm and the number of prediction minutes used for the title. 
+***************************************
+Example 10
+Project: Stock-Price-Prediction	Author: dhingratul	File: helper.py	
+def plot_mul(Y_hat, Y, pred_len):
+    """
+    PLots the predicted data versus true data
+
+    Input: Predicted data, True Data, Length of prediction
+    Output: return plot
+
+    Note: Run from timeSeriesPredict.py
+    """
+    fig = plt.figure(facecolor='white')
+    ax = fig.add_subplot(111)
+    ax.plot(Y, label='Y')
+    # Print the predictions in its respective series-length
+    for i, j in enumerate(Y_hat):
+        shift = [None for p in range(i * pred_len)]
+        plt.plot(shift + j, label='Y_hat')
+        plt.legend()
+    plt.show() 
+***************************************
+Example 11
+Project: mmdetection	Author: open-mmlab	File: recall.py	
+def plot_num_recall(recalls, proposal_nums):
+    """Plot Proposal_num-Recalls curve.
+
+    Args:
+        recalls(ndarray or list): shape (k,)
+        proposal_nums(ndarray or list): same shape as `recalls`
+    """
+    if isinstance(proposal_nums, np.ndarray):
+        _proposal_nums = proposal_nums.tolist()
+    else:
+        _proposal_nums = proposal_nums
+    if isinstance(recalls, np.ndarray):
+        _recalls = recalls.tolist()
+    else:
+        _recalls = recalls
+
+    import matplotlib.pyplot as plt
+    f = plt.figure()
+    plt.plot([0] + _proposal_nums, [0] + _recalls)
+    plt.xlabel('Proposal num')
+    plt.ylabel('Recall')
+    plt.axis([0, proposal_nums.max(), 0, 1])
+    f.show() 
+***************************************
+Example 12
+Project: mmdetection	Author: open-mmlab	File: recall.py	
+def plot_iou_recall(recalls, iou_thrs):
+    """Plot IoU-Recalls curve.
+
+    Args:
+        recalls(ndarray or list): shape (k,)
+        iou_thrs(ndarray or list): same shape as `recalls`
+    """
+    if isinstance(iou_thrs, np.ndarray):
+        _iou_thrs = iou_thrs.tolist()
+    else:
+        _iou_thrs = iou_thrs
+    if isinstance(recalls, np.ndarray):
+        _recalls = recalls.tolist()
+    else:
+        _recalls = recalls
+
+    import matplotlib.pyplot as plt
+    f = plt.figure()
+    plt.plot(_iou_thrs + [1.0], _recalls + [0.])
+    plt.xlabel('IoU')
+    plt.ylabel('Recall')
+    plt.axis([iou_thrs.min(), 1, 0, 1])
+    f.show() 
+***************************************
+Example 13
+Project: neural-fingerprinting	Author: StephanZheng	File: util.py	
+def compute_roc(y_true, y_pred, plot=False):
+    """
+    TODO
+    :param y_true: ground truth
+    :param y_pred: predictions
+    :param plot:
+    :return:
+    """
+    fpr, tpr, _ = roc_curve(y_true, y_pred)
+    auc_score = auc(fpr, tpr)
+    if plot:
+        plt.figure(figsize=(7, 6))
+        plt.plot(fpr, tpr, color='blue',
+                 label='ROC (AUC = %0.4f)' % auc_score)
+        plt.legend(loc='lower right')
+        plt.title("ROC Curve")
+        plt.xlabel("FPR")
+        plt.ylabel("TPR")
+        plt.show()
+
+    return fpr, tpr, auc_score 
+***************************************
+Example 14
+Project: neural-fingerprinting	Author: StephanZheng	File: util.py	
+def compute_roc_rfeinman(probs_neg, probs_pos, plot=False):
+    """
+    TODO
+    :param probs_neg:
+    :param probs_pos:
+    :param plot:
+    :return:
+    """
+    probs = np.concatenate((probs_neg, probs_pos))
+    labels = np.concatenate((np.zeros_like(probs_neg), np.ones_like(probs_pos)))
+    fpr, tpr, _ = roc_curve(labels, probs)
+    auc_score = auc(fpr, tpr)
+    if plot:
+        plt.figure(figsize=(7, 6))
+        plt.plot(fpr, tpr, color='blue',
+                 label='ROC (AUC = %0.4f)' % auc_score)
+        plt.legend(loc='lower right')
+        plt.title("ROC Curve")
+        plt.xlabel("FPR")
+        plt.ylabel("TPR")
+        plt.show()
+
+    return fpr, tpr, auc_score 
+***************************************
+Example 15
+Project: tensorflow-DeepFM	Author: ChenglongChen	File: main.py	
+def _plot_fig(train_results, valid_results, model_name):
+    colors = ["red", "blue", "green"]
+    xs = np.arange(1, train_results.shape[1]+1)
+    plt.figure()
+    legends = []
+    for i in range(train_results.shape[0]):
+        plt.plot(xs, train_results[i], color=colors[i], linestyle="solid", marker="o")
+        plt.plot(xs, valid_results[i], color=colors[i], linestyle="dashed", marker="o")
+        legends.append("train-%d"%(i+1))
+        legends.append("valid-%d"%(i+1))
+    plt.xlabel("Epoch")
+    plt.ylabel("Normalized Gini")
+    plt.title("%s"%model_name)
+    plt.legend(legends)
+    plt.savefig("./fig/%s.png"%model_name)
+    plt.close()
+
+
+# load data 
+***************************************
+Example 16
+Project: cplot	Author: sunchaoatmo	File: cstimeserial.py	
+def setmonthlyticklabe(yb,ye,units_cur,calendar_cur):
+  x_tickloc_major=[]
+  labels_major   =[]
+  x_tickloc_major=[0]
+  begdate=datetime.datetime(yb,1 , 1, 0,0,0)                
+  enddate=datetime.datetime(ye,12 , 1, 0,0,0)                
+  T0=date2num( curdate,units=units_cur,calendar=calendar_cur)
+  labels_major=[curdate.strftime("%m-%d")]
+  for imonth,month in enumerate(range(LLJ_sm+1,LLJ_em+2)):
+    curdate=datetime.datetime(years[0],month , 1, 0,0,0)                
+    T_loc=date2num( curdate,units=units_cur,calendar=calendar_cur)-T0
+    ax.plot([T_loc,T_loc],[0,len(xlat)-1], lw=1, c="r",linestyle="--")
+    x_tickloc_major.append(T_loc)
+    labels_major.append(curdate.strftime("%m/%d"))
+  ax.set_xticks( x_tickloc_major )
+  ax.set_xticklabels(labels_major,color='brown') 
+***************************************
+Example 17
+Project: deep-learning-note	Author: wdxtub	File: simulate_sin.py	
+def run_eval(sess, test_X, test_y):
+    ds = tf.data.Dataset.from_tensor_slices((test_X, test_y))
+    ds = ds.batch(1)
+    X, y = ds.make_one_shot_iterator().get_next()
+
+    with tf.variable_scope("model", reuse=True):
+        prediction, _, _ = lstm_model(X, [0.0], False)
+        predictions = []
+        labels = []
+        for i in range(TESTING_EXAMPLES):
+            p, l = sess.run([prediction, y])
+            predictions.append(p)
+            labels.append(l)
+
+    predictions = np.array(predictions).squeeze()
+    labels = np.array(labels).squeeze()
+    rmse = np.sqrt(((predictions-labels) ** 2).mean(axis=0))
+    print("Mean Square Error is: %f" % rmse)
+
+    plt.figure()
+    plt.plot(predictions, label='predictions')
+    plt.plot(labels, label='real_sin')
+    plt.legend()
+    plt.show() 
+***************************************
+Example 18
+Project: DOTA_models	Author: ringringyi	File: plot_lfads.py	
+def plot_time_series(vals_bxtxn, bidx=None, n_to_plot=np.inf, scale=1.0,
+                     color='r', title=None):
+
+  if bidx is None:
+    vals_txn = np.mean(vals_bxtxn, axis=0)
+  else:
+    vals_txn = vals_bxtxn[bidx,:,:]
+
+  T, N = vals_txn.shape
+  if n_to_plot > N:
+    n_to_plot = N
+
+  plt.plot(vals_txn[:,0:n_to_plot] + scale*np.array(range(n_to_plot)),
+           color=color, lw=1.0)
+  plt.axis('tight')
+  if title:
+    plt.title(title) 
+***************************************
+Example 19
+Project: ReinforcementLearningBookExamples	Author: Shawn-Guo-CN	File: 1TenArmedBandits.py	
+def epsilon_greedy(num_bandits, episode_length):
+    epsilons = [0., 0.1, 0.01]
+    agents = []
+    for ep_idx, ep in enumerate(epsilons):
+        agents.append(Agent(epsilon=ep, sample_average=True))
+    best_action_counts, average_rewards = play_game(num_bandits, episode_length, agents)
+    global figure_index
+    plt.figure(figure_index)
+    figure_index += 1
+    for eps, counts in zip(epsilons, best_action_counts):
+        plt.plot(counts, label='epsilon = ' + str(eps))
+    plt.xlabel('Steps')
+    plt.ylabel('% optimal action')
+    plt.legend()
+    plt.figure(figure_index)
+    figure_index += 1
+    for eps, rewards in zip(epsilons, average_rewards):
+        plt.plot(rewards, label='epsilon = ' + str(eps))
+    plt.xlabel('Steps')
+    plt.ylabel('average reward')
+    plt.legend()
+
+
+# generate figure 2.3 
+***************************************
+Example 20
+Project: simulated-annealing-tsp	Author: chncyhn	File: anneal.py	
+def plot_learning(self):
+        """
+        Plot the fitness through iterations.
+        """
+        plt.plot([i for i in range(len(self.fitness_list))], self.fitness_list)
+        plt.ylabel("Fitness")
+        plt.xlabel("Iteration")
+        plt.show() 
+***************************************
+Example 21
+Project: kicker-module	Author: EvanTheB	File: graph.py	
+def graph_skill_topn(p, g, ladder, n):
+    def get_names_skill(data):
+        ret = []
+        for l in data:
+            ret.append((l.name, l.extra[1][1]))
+        return ret
+
+    def get_top_n(data):
+        tup = sorted(data, key=lambda x: float(x[1]))
+        names = [t[0] for t in tup[-n:]]
+        return names
+
+    graph_data = []
+    for i in range(1, len(g) + 1):
+        data = ladder.process(p, g[0:i])
+        graph_data.append(get_names_skill(data))
+
+    names = sorted(get_top_n(graph_data[-1]))
+    graph_data = [sorted(x) for x in get_subset(graph_data, names)]
+
+    ys = data_to_yarr(graph_data)
+    for i in range(len(ys)):
+        y = np.array(ys[i])
+        plt.plot(range(len(y)), y, label = names[i])
+    plt.legend(loc=3, ncol=len(names)/2)
+    pylab.savefig('graph_skill_topn.svg')
+ #   plt.show() 
+***************************************
+Example 22
+Project: kicker-module	Author: EvanTheB	File: graph.py	
+def graph_skill_error(p, g, ladder):
+    def get_names_skill(data):
+        ret = []
+        for l in data:
+            ret.append((l.name, l.extra[1][1]))
+        return ret
+
+    def get_names_err(data):
+        ret = []
+        for l in data:
+            ret.append((l.name, l.extra[2][1]))
+        return ret
+
+    def get_top_n(data):
+        tup = sorted(data, key=lambda x: float(x[1]))
+        names = [t[0] for t in tup[:6]]
+        return names
+
+    graph_data = []
+    err_data = []
+    for i in range(1, len(g) + 1):
+        data = ladder.process(p, g[0:i])
+        graph_data.append(get_names_skill(data))
+        err_data.append(get_names_err(data))
+    names = sorted(get_top_n(err_data[-1]))
+    graph_data = [sorted(x) for x in get_subset(graph_data, names)]
+    err_data = [sorted(x) for x in get_subset(err_data, names)]
+
+    ys = data_to_yarr(graph_data)
+    errs = data_to_yarr(err_data)
+    for i in range(len(ys)):
+        err = np.array(errs[i])
+        y = np.array(ys[i])
+        plt.fill_between(range(len(y)), y+err, y-err, alpha=0.25, color=COLOURS[i])
+        plt.plot(range(len(y)), y, COLOURS[i] +'-', label = names[i])
+        plt.plot(y)
+    plt.legend(loc=3, ncol=len(names)/2)
+    pylab.savefig('graph_error.svg')
+#    plt.show() 
+***************************************
+Example 23
+Project: projection-methods	Author: akshayka	File: circles.py	
+def plot_iterates(iterates, label):
+    x = [float(i[0]) for i in iterates]
+    y = [float(i[1]) for i in iterates]
+    plt.scatter(x=x, y=y)
+    plt.plot(x, y, label=label) 
+***************************************
+Example 24
+Project: pepper-robot-programming	Author: maverickjoy	File: asthama_search.py	
+def _initialisePlot(self):
+
+        plt.rc('grid', linestyle=":", color='black')
+        plt.rcParams['axes.facecolor'] = 'black'
+        plt.rcParams['axes.edgecolor'] = 'white'
+        plt.rcParams['grid.alpha'] = 1
+        plt.rcParams['grid.color'] = "green"
+        plt.grid(True)
+        plt.xlim(self.PLOTXMIN, self.PLOTXMAX)
+        plt.ylim(self.PLOTYMIN, self.PLOTYMAX)
+        self.graph, = plt.plot([], [], 'o')
+
+        return 
+***************************************
+Example 25
+Project: pepper-robot-programming	Author: maverickjoy	File: asthama_search.py	
+def run(self):
+        self._printLogs("Waiting for the robot to be in wake up position", "OKBLUE")
+
+        self.motion_service.wakeUp()
+        self.posture_service.goToPosture("StandInit", 0.1)
+
+        self.create_callbacks()
+        # self.startDLServer()
+        self._addTopic()
+
+        # graphplots
+        self._initialisePlot()
+        ani = animation.FuncAnimation(self.fig, self._animate, blit=False, interval=500 ,repeat=False)
+
+
+        # loop on, wait for events until manual interruption
+        try:
+            # while True:
+            #     time.sleep(1)
+            # starting graph plot
+            plt.show() # blocking call hence no need for while(True)
+
+        except KeyboardInterrupt:
+            self._printLogs("Interrupted by user, shutting down", "FAIL")
+            self._cleanUp()
+
+            self._printLogs("Waiting for the robot to be in rest position", "FAIL")
+            # self.motion_service.rest()
+            sys.exit(0)
+
+        return 
+***************************************
+Example 26
+Project: sfcc	Author: kv-kunalvyas	File: auxiliary.py	
+def plotLearningCurves(train, classifier):
+    #P.show()
+    X = train.values[:, 1::]
+    y = train.values[:, 0]
+
+    train_sizes, train_scores, test_scores = learning_curve(
+            classifier, X, y, cv=10, n_jobs=-1, train_sizes=np.linspace(.1, 1., 10), verbose=0)
+
+    train_scores_mean = np.mean(train_scores, axis=1)
+    train_scores_std = np.std(train_scores, axis=1)
+    test_scores_mean = np.mean(test_scores, axis=1)
+    test_scores_std = np.std(test_scores, axis=1)
+
+    plt.figure()
+    plt.title("Learning Curves")
+    plt.legend(loc="best")
+    plt.xlabel("Training samples")
+    plt.ylabel("Error Rate")
+    plt.ylim((0, 1))
+    plt.gca().invert_yaxis()
+    plt.grid()
+
+    # Plot the average training and test score lines at each training set size
+    plt.plot(train_sizes, train_scores_mean, 'o-', color="b", label="Training score")
+    plt.plot(train_sizes, test_scores_mean, 'o-', color="r", label="Test score")
+
+    # Plot the std deviation as a transparent range at each training set size
+    plt.fill_between(train_sizes, train_scores_mean - train_scores_std, train_scores_mean + train_scores_std,
+                     alpha=0.1, color="b")
+    plt.fill_between(train_sizes, test_scores_mean - test_scores_std, test_scores_mean + test_scores_std,
+                     alpha=0.1, color="r")
+
+    # Draw the plot and reset the y-axis
+    plt.draw()
+    plt.gca().invert_yaxis()
+
+    # shuffle and split training and test sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.25)
+    classifier.fit(X_train, y_train)
+    plt.show() 
+***************************************
+Example 27
+Project: fenics-topopt	Author: zfergus	File: triangulate.py	
+def plot_mesh(V, F, plot_f=False):
+    plt.scatter(V[:, 0], V[:, 1])
+    if not plot_f:
+        return
+    for i in range(F.shape[0]):
+        vf = V[F[i, :], :]
+        plt.plot(vf[:, 0], vf[:, 1]) 
+***************************************
+Example 28
+Project: kipet	Author: salvadorgarciamunoz	File: data_tools.py	
+def plot_spectral_data(dataFrame,dimension='2D'):
+    """ Plots spectral data
+    
+        Args:
+            dataFrame (DataFrame): spectral data
+          
+        Returns:
+            None
+
+    """
+    if dimension=='3D':
+        lambdas = dataFrame.columns
+        times = dataFrame.index
+        D = np.array(dataFrame)
+        L, T = np.meshgrid(lambdas, times)
+        fig = plt.figure()
+        #ax = fig.add_subplot(111, projection='3d')
+        #ax.plot_wireframe(L, T, D, rstride=10, cstride=10)
+        ax = fig.gca(projection='3d')
+        ax.plot_surface(L, T, D, rstride=10, cstride=10, alpha=0.2)
+        #cset = ax.contour(L, T, D, zdir='z',offset=-10)
+        cset = ax.contour(L, T, D, zdir='x',offset=-20,cmap='coolwarm')
+        cset = ax.contour(L, T, D, zdir='y',offset=times[-1]*1.1,cmap='coolwarm')
+        
+        ax.set_xlabel('Wavelength')
+        ax.set_xlim(lambdas[0]-20, lambdas[-1])
+        ax.set_ylabel('time')
+        ax.set_ylim(0, times[-1]*1.1)
+        ax.set_zlabel('Spectra')
+        #ax.set_zlim(-10, )
+
+
+    else:
+        plt.figure()
+        plt.plot(dataFrame)
+
+#=============================================================================
+#--------------------------- DIAGNOSTIC TOOLS ------------------------
+#============================================================================= 
+***************************************
+Example 29
+Project: wikilinks	Author: trovdimi	File: click_distributions.py	
+def plot_counts_frequency():
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+
+    category_distributions = read_pickle(HOME+'output/category_counts_distribution.obj')
+    data = category_distributions['counts']
+    data = [int(x[0]) for x in data]
+    #to consider the edges that have zero transitions we substract the number transitions from the number of edges in wikipeida
+    #number_of_edges = 339463340
+    #zeros = np.zeros((number_of_edges - len(data)))
+    #data = np.append(zeros, data)
+    #bins = [0,11]
+    #bins.extend(np.linspace(100,10000))
+    #data = data.extend(listofzeros)
+    #print data
+    hist, bin_edges = np.histogram(data, bins=10000)
+    #print len(hist)
+    #print len(bin_edges)
+    print hist, bin_edges
+
+    ax.set_yscale('log')
+    ax.set_xscale('log')
+    ax.plot(bin_edges[:-1], hist, marker='o', markersize=3, markeredgecolor='none', color='#D65F5F')
+
+    #ax.set_ylim([10**0, 10**6])
+    #ax.set_xlim([10**0, 10**6])
+    ax.set_xlabel('Number of transitions')
+    ax.set_ylabel('Frequency')
+
+    fig.tight_layout()
+    fig.savefig( 'output/agg_counts_distributions.pdf', bbox_inches='tight') 
+***************************************
+Example 30
+Project: OpenAPS	Author: medicinexlab	File: bglomb.py	
+def _plot_lomb(period, lomb, time_array, value_array, name_str):
+    plt.plot(time_array, value_array, label='Actual ' + name_str)
+    plt.plot(period, lomb, label='Lomb ' + name_str)
+
+
+#This function gets the data from the lomb scargle. It takes in the start and end indices and returns a lomb scargle model for BG, IOB, and COB as well as the period 
+***************************************
+Example 31
+Project: OpenAPS	Author: medicinexlab	File: bglomb.py	
+def get_lomb_data(bg_df, start_index, end_index, plot_lomb_array):
+    """
+    Function to make a lomb-scargle periodogram from the OpenAPS data in order to get
+    data for every minute, not just every 5 minutes. It takes in the dataframe
+    and the start and stop indices along with the plot_lomb_array, which is an array
+    with the values that allow you to plot the lomb-scargle values with matplotlib.
+
+    Input:      bg_df                           Pandas dataframe of all of the data from ./data/[id_str]/devicestatus.json
+                start_index                     The start index of the set. Should be higher in value than end_index, as
+                                                    the earlier times have higher indices
+                end_index                       The end index of the set. Should be lower in value than start_index, as
+                                                    the later times have lower indices. Inclusive, so this index is included in the data
+                plot_lomb_array                 Array with the types to be plotted as strings. e.g. ['bg','iob','cob']
+.
+    Output:     lomb_data                       The namedtuple holding the lomb-scargle data with these arrays:
+                                                    ['period', 'bg_lomb', 'iob_lomb', 'cob_lomb', 'time_value_array', data_gap_start_time, data_gap_end_time]
+                                                    data_gap_start_time: Array with the start times of the data gaps that will be skipped
+                                                    The indices of this and data_gap_end_time correspond to the same data gap
+                                                    data_gap_end_time: Array with the end times of the data gaps that will be skipped
+                                                    The indices of this and data_gap_start_time correspond to the same data gap
+    Usage:      train_lomb_data = get_lomb_data(bg_df, start_train_index, end_train_index, ['bg', 'iob'])
+    """
+
+    #Make the time_value_array, which is the array of hours from midnight
+    time_value_array = _make_time_value_array(bg_df, start_index, end_index)
+    period, bg_lomb, iob_lomb, cob_lomb, data_gap_start_time, data_gap_end_time = _get_lomb_scargle(bg_df, start_index, end_index, plot_lomb_array)
+
+    lomb_data = LombData(period, bg_lomb, iob_lomb, cob_lomb, time_value_array, data_gap_start_time, data_gap_end_time)
+
+    return lomb_data 
+***************************************
+Example 32
+Project: OpenAPS	Author: medicinexlab	File: oldpred.py	
+def _plot_old_pred_data(old_pred_data, show_pred_plot, save_pred_plot, show_clarke_plot, save_clarke_plot, id_str, algorithm_str, minutes_str):
+    actual_bg_array = old_pred_data.result_actual_bg_array
+    actual_bg_time_array = old_pred_data.result_actual_bg_time_array
+    pred_array = old_pred_data.result_pred_array
+    pred_time_array = old_pred_data.result_pred_time_array
+
+    #Root mean squared error
+    rms = math.sqrt(metrics.mean_squared_error(actual_bg_array, pred_array))
+    print "                Root Mean Squared Error: " + str(rms)
+    print "                Mean Absolute Error: " + str(metrics.mean_absolute_error(actual_bg_array, pred_array))
+    print "                R^2 Coefficient of Determination: " + str(metrics.r2_score(actual_bg_array, pred_array))
+
+    plot, zone = ClarkeErrorGrid.clarke_error_grid(actual_bg_array, pred_array, id_str + " " + algorithm_str + " " + minutes_str)
+    print "                Percent A:{}".format(float(zone[0]) / (zone[0] + zone[1] + zone[2] + zone[3] + zone[4]))
+    print "                Percent C, D, E:{}".format(float(zone[2] + zone[3] + zone[4])/ (zone[0] + zone[1] + zone[2] + zone[3] + zone[4]))
+    print "                Zones are A:{}, B:{}, C:{}, D:{}, E:{}\n".format(zone[0],zone[1],zone[2],zone[3],zone[4])
+    if save_clarke_plot: plt.savefig(id_str + algorithm_str.replace(" ", "") + minutes_str + "clarke.png")
+    if show_clarke_plot: plot.show()
+
+    plt.clf()
+    plt.plot(actual_bg_time_array, actual_bg_array, label="Actual BG", color='black', linestyle='-')
+    plt.plot(pred_time_array, pred_array, label="BG Prediction", color='black', linestyle=':')
+    plt.title(id_str + " " + algorithm_str + " " + minutes_str + " BG Analysis")
+    plt.ylabel("Blood Glucose Level (mg/dl)")
+    plt.xlabel("Time (minutes)")
+    plt.legend(loc='upper left')
+
+    # SHOW/SAVE PLOT DEPENDING ON THE BOOLEAN PARAMETER
+    if save_pred_plot: plt.savefig(id_str + algorithm_str.replace(" ","") + minutes_str + "plot.png")
+    if show_pred_plot: plt.show()
+
+
+#Function to analyze the old OpenAPS data 
+***************************************
+Example 33
+Project: RandomFourierFeatures	Author: tiskw	File: sample_rff_regression.py	
+def main():
+
+    ### Fix seed for random fourier feature calclation
+    pyrff.seed(111)
+
+    ### Prepare training data
+    Xs_train = np.linspace(0, 3, 21).reshape((21, 1))
+    ys_train = np.sin(Xs_train**2)
+    Xs_test  = np.linspace(0, 3, 101).reshape((101, 1))
+    ys_test  = np.sin(Xs_test**2)
+
+    ### Create classifier instance
+    reg = pyrff.RFFRegression(dim_output = 8, std = 0.5)
+
+    ### Train regression with random fourier features
+    reg.fit(Xs_train, ys_train)
+
+    ### Conduct prediction for the test data
+    predict = reg.predict(Xs_test)
+
+    ### Plot regression results
+    mpl.figure(0)
+    mpl.title("Regression for function y = sin(x^2) with RFF")
+    mpl.xlabel("X")
+    mpl.ylabel("Y")
+    mpl.plot(Xs_train, ys_train, "o")
+    mpl.plot(Xs_test,  ys_test,  ".")
+    mpl.plot(Xs_test,  predict,  "-")
+    mpl.legend(["Training data", "Test data", "Prediction by RFF regression"])
+    mpl.grid()
+    mpl.show() 
+***************************************
+Example 34
+Project: mmdetection	Author: open-mmlab	File: analyze_logs.py	
+def add_plot_parser(subparsers):
+    parser_plt = subparsers.add_parser(
+        'plot_curve', help='parser for plotting curves')
+    parser_plt.add_argument(
+        'json_logs',
+        type=str,
+        nargs='+',
+        help='path of train log in json format')
+    parser_plt.add_argument(
+        '--keys',
+        type=str,
+        nargs='+',
+        default=['bbox_mAP'],
+        help='the metric that you want to plot')
+    parser_plt.add_argument('--title', type=str, help='title of figure')
+    parser_plt.add_argument(
+        '--legend',
+        type=str,
+        nargs='+',
+        default=None,
+        help='legend of each plot')
+    parser_plt.add_argument(
+        '--backend', type=str, default=None, help='backend of plt')
+    parser_plt.add_argument(
+        '--style', type=str, default='dark', help='style of plt')
+    parser_plt.add_argument('--out', type=str, default=None) 
+***************************************
+Example 35
+Project: mmdetection	Author: open-mmlab	File: analyze_logs.py	
+def parse_args():
+    parser = argparse.ArgumentParser(description='Analyze Json Log')
+    # currently only support plot curve and calculate average train time
+    subparsers = parser.add_subparsers(dest='task', help='task parser')
+    add_plot_parser(subparsers)
+    add_time_parser(subparsers)
+    args = parser.parse_args()
+    return args 
+***************************************
+Example 36
+Project: Kaggle-Statoil-Challenge	Author: adodd202	File: utils.py	
+def plot_overlap(logger, names=None):
+    names = logger.names if names == None else names
+    numbers = logger.numbers
+    for _, name in enumerate(names):
+        x = np.arange(len(numbers[name]))
+        if name in ['Train Acc.', 'Valid Acc.']:
+            plt.plot(x, 100 - np.asarray(numbers[name], dtype='float'))
+        else:
+            plt.plot(x, np.asarray(numbers[name]))
+    return [logger.title + '(' + name + ')' for name in names] 
+***************************************
+Example 37
+Project: Kaggle-Statoil-Challenge	Author: adodd202	File: utils.py	
+def plot(self, names=None):
+        names = self.names if names == None else names
+        numbers = self.numbers
+        for _, name in enumerate(names):
+            x = np.arange(len(numbers[name]))
+            plt.plot(x, np.asarray(numbers[name]))
+        plt.legend([self.title + '(' + name + ')' for name in names])
+        plt.grid(True) 
+***************************************
+Example 38
+Project: Kaggle-Statoil-Challenge	Author: adodd202	File: utils.py	
+def plot(self, names=None):
+        plt.figure()
+        plt.plot()
+        legend_text = []
+        for logger in self.loggers:
+            legend_text += plot_overlap(logger, names)
+        legend_text = ['WRN-28-10+Ours (error 17.65%)', 'WRN-28-10 (error 18.68%)']
+        plt.legend(legend_text, loc=0)
+        plt.ylabel('test error (%)')
+        plt.xlabel('epoch')
+        plt.grid(True) 
+***************************************
+Example 39
+Project: Sessile.drop.analysis	Author: mvgorcum	File: GUI_sessile_drop_analysis.py	
+def plotstuff(typexplot,typeyplot,logxbool,logybool,pxscale,fps):
+    x=np.float()
+    y=np.float()
+    if typexplot==1:
+        x=thetal
+    elif typexplot==2:
+        x=thetar
+    elif typexplot==3:
+        x=dropvolume*pxscale**3
+    elif typexplot==3:
+        x=leftspeed*pxscale*fps
+    elif typexplot==4:
+        x=rightspeed*pxscale*fps
+    else:
+        print('no x variable set')
+    if typeyplot==1:
+        y=thetal
+    elif typeyplot==2:
+        y=thetar
+    elif typeyplot==3:
+        y=dropvolume
+    elif typeyplot==3:
+        y=leftspeed
+    elif typeyplot==4:
+        y=rightspeed
+    else:
+        print('no y variable set')
+    if x.size==1 or y.size==1:
+        plt.scatter(x,y)
+    else:
+        plt.plot(x,y)
+    
+    if logxbool:
+        plt.xscale('log')
+    if logybool:
+        plt.yscale('log')
+    plt.show() 
+***************************************
+Example 40
+Project: neural-fingerprinting	Author: StephanZheng	File: utils.py	
+def pair_visual(original, adversarial, figure=None):
+    """
+    This function displays two images: the original and the adversarial sample
+    :param original: the original input
+    :param adversarial: the input after perterbations have been applied
+    :param figure: if we've already displayed images, use the same plot
+    :return: the matplot figure to reuse for future samples
+    """
+    import matplotlib.pyplot as plt
+
+    # Squeeze the image to remove single-dimensional entries from array shape
+    original = np.squeeze(original)
+    adversarial = np.squeeze(adversarial)
+
+    # Ensure our inputs are of proper shape
+    assert(len(original.shape) == 2 or len(original.shape) == 3)
+
+    # To avoid creating figures per input sample, reuse the sample plot
+    if figure is None:
+        plt.ion()
+        figure = plt.figure()
+        figure.canvas.set_window_title('Cleverhans: Pair Visualization')
+
+    # Add the images to the plot
+    perterbations = adversarial - original
+    for index, image in enumerate((original, perterbations, adversarial)):
+        figure.add_subplot(1, 3, index + 1)
+        plt.axis('off')
+
+        # If the image is 2D, then we have 1 color channel
+        if len(image.shape) == 2:
+            plt.imshow(image, cmap='gray')
+        else:
+            plt.imshow(image)
+
+        # Give the plot some time to update
+        plt.pause(0.01)
+
+    # Draw the plot and return
+    plt.show()
+    return figure 
+***************************************
+Example 41
+Project: neural-fingerprinting	Author: StephanZheng	File: utils.py	
+def grid_visual(data):
+    """
+    This function displays a grid of images to show full misclassification
+    :param data: grid data of the form;
+        [nb_classes : nb_classes : img_rows : img_cols : nb_channels]
+    :return: if necessary, the matplot figure to reuse
+    """
+    import matplotlib.pyplot as plt
+
+    # Ensure interactive mode is disabled and initialize our graph
+    plt.ioff()
+    figure = plt.figure()
+    figure.canvas.set_window_title('Cleverhans: Grid Visualization')
+
+    # Add the images to the plot
+    num_cols = data.shape[0]
+    num_rows = data.shape[1]
+    num_channels = data.shape[4]
+    current_row = 0
+    for y in xrange(num_rows):
+        for x in xrange(num_cols):
+            figure.add_subplot(num_rows, num_cols, (x + 1) + (y * num_cols))
+            plt.axis('off')
+
+            if num_channels == 1:
+                plt.imshow(data[x, y, :, :, 0], cmap='gray')
+            else:
+                plt.imshow(data[x, y, :, :, :])
+
+    # Draw the plot and return
+    plt.show()
+    return figure 
+***************************************
+Example 42
+Project: voice-recognition	Author: golabies	File: filters.py	
+def show(func, *inputs):
+        x = func(*inputs)
+        y = np.arange(len(x))
+        plt.plot(y, x)
+        plt.show() 
+***************************************
+Example 43
+Project: voice-recognition	Author: golabies	File: read_data.py	
+def show(self):
+        for i in range(len(self.voice)):
+            plt.plot(np.arange(len(self.voice[i])), self.voice[i]+i*5)
+        plt.show() 
+***************************************
+Example 44
+Project: voice-recognition	Author: golabies	File: signal_fft.py	
+def show(self):
+        plt.plot(self.freq, np.log10(self.out_put))
+        plt.show() 
+***************************************
+Example 45
+Project: Random-Erasing	Author: zhunzhong07	File: logger.py	
+def plot_overlap(logger, names=None):
+    names = logger.names if names == None else names
+    numbers = logger.numbers
+    for _, name in enumerate(names):
+        x = np.arange(len(numbers[name]))
+        if name in ['Train Acc.', 'Valid Acc.']:
+            plt.plot(x, 100-np.asarray(numbers[name], dtype='float'))
+        else:
+            plt.plot(x, np.asarray(numbers[name]))
+    return [logger.title + '(' + name + ')' for name in names] 
+***************************************
+Example 46
+Project: Random-Erasing	Author: zhunzhong07	File: logger.py	
+def plot(self, names=None):   
+        names = self.names if names == None else names
+        numbers = self.numbers
+        for _, name in enumerate(names):
+            x = np.arange(len(numbers[name]))
+            plt.plot(x, np.asarray(numbers[name]))
+        plt.legend([self.title + '(' + name + ')' for name in names])
+        plt.grid(True) 
+***************************************
+Example 47
+Project: Random-Erasing	Author: zhunzhong07	File: logger.py	
+def plot(self, names=None):
+        plt.figure()
+        plt.plot()
+        legend_text = []
+        for logger in self.loggers:
+            legend_text += plot_overlap(logger, names)
+        legend_text = ['WRN-28-10+Ours (error 17.65%)', 'WRN-28-10 (error 18.68%)']
+        plt.legend(legend_text, loc=0)
+        plt.ylabel('test error (%)')
+        plt.xlabel('epoch')
+        plt.grid(True) 
+***************************************
+Example 48
+Project: cplot	Author: sunchaoatmo	File: cstimeserial.py	
+def corplot(data,vname):
+  filename=data.plotname+"_"+"".join(vname)
+  outputformat="pdf"
+  if outputformat=="pdf":
+    pp = PdfPages(filename+'.pdf')
+  else:
+    page=0
+  fig = plt.figure()
+  gs0 = gridspec.GridSpec(1,1 )
+  ax1 = plt.subplot(gs0[0])
+  import numpy as np
+  for casenumber,case in enumerate(data.plotlist):
+    #units_cur=data.time[case][vname].units
+    #calendar_cur=data.time[case][vname].calendar
+    legname = sim_nicename.get(case,case)
+    color1=tableau20[2*(casenumber)] 
+    plt.plot(data.plotdata[case][vname][:],label=legname,color=color1,lw=0.8)
+    leg=ax1.legend(loc=1,borderaxespad=0.,frameon=False, fontsize=6)
+
+  plt.ylim([0.8,1.0])
+  #plt.xlim([0.,150])
+  
+  if outputformat=="pdf":
+    pp.savefig()
+  else:
+    figurename=filename+str(page)+"."+outputformat
+    page+=1
+    fig.savefig(figurename,format=outputformat,dpi=300) #,dpi=300)
+  fig.clf()
+  if outputformat=="pdf":
+    pp.close() 
+***************************************
+Example 49
+Project: deep-learning-note	Author: wdxtub	File: utils.py	
+def show_trace_2d(f, results):
+    plt.plot(*zip(*results), '-o', color='#ff7f0e')
+    x1, x2 = np.meshgrid(np.arange(-5.5, 1.0, 0.1), np.arange(-3.0, 1.0, 0.1))
+    plt.contour(x1, x2, f(x1, x2), colors='#1f77b4')
+    plt.xlabel('x1')
+    plt.ylabel('x2')
+    plt.show() 
+***************************************
+Example 50
+Project: deep-learning-note	Author: wdxtub	File: utils.py	
+def train_opt(optimizer_fn, states, hyperparams, features, labels,
+              batch_size=10, num_epochs=2):
+    # 初始化模型
+    net, loss = linreg, squared_loss
+
+    w = torch.nn.Parameter(torch.tensor(np.random.normal(0, 0.01, size=(features.shape[1], 1)), dtype=torch.float32),
+                           requires_grad=True)
+    b = torch.nn.Parameter(torch.zeros(1, dtype=torch.float32), requires_grad=True)
+
+    def eval_loss():
+        return loss(net(features, w, b), labels).mean().item()
+
+    ls = [eval_loss()]
+    data_iter = torch.utils.data.DataLoader(
+        torch.utils.data.TensorDataset(features, labels), batch_size, shuffle=True)
+
+    for _ in range(num_epochs):
+        start = time.time()
+        for batch_i, (X, y) in enumerate(data_iter):
+            l = loss(net(X, w, b), y).mean()  # 使用平均损失
+
+            # 梯度清零
+            if w.grad is not None:
+                w.grad.data.zero_()
+                b.grad.data.zero_()
+
+            l.backward()
+            optimizer_fn([w, b], states, hyperparams)  # 迭代模型参数
+            if (batch_i + 1) * batch_size % 100 == 0:
+                ls.append(eval_loss())  # 每100个样本记录下当前训练误差
+    # 打印结果和作图
+    print('loss: %f, %f sec per epoch' % (ls[-1], time.time() - start))
+    plt.plot(np.linspace(0, num_epochs, len(ls)), ls)
+    plt.xlabel('epoch')
+    plt.ylabel('loss')
+    plt.show()
+
+
+# 本函数与原书不同的是这里第一个参数优化器函数而不是优化器的名字
+# 例如: optimizer_fn=torch.optim.SGD, optimizer_hyperparams={"lr": 0.05} 
+***************************************
+Example 51
+Project: deep-learning-note	Author: wdxtub	File: utils.py	
+def train_opt_pytorch(optimizer_fn, optimizer_hyperparams, features, labels,
+                      batch_size=10, num_epochs=2):
+    # 初始化模型
+    net = nn.Sequential(
+        nn.Linear(features.shape[-1], 1)
+    )
+    loss = nn.MSELoss()
+    optimizer = optimizer_fn(net.parameters(), **optimizer_hyperparams)
+
+    def eval_loss():
+        return loss(net(features).view(-1), labels).item() / 2
+
+    ls = [eval_loss()]
+    data_iter = torch.utils.data.DataLoader(
+        torch.utils.data.TensorDataset(features, labels), batch_size, shuffle=True)
+
+    for _ in range(num_epochs):
+        start = time.time()
+        for batch_i, (X, y) in enumerate(data_iter):
+            # 除以2是为了和train_ch7保持一致, 因为squared_loss中除了2
+            l = loss(net(X).view(-1), y) / 2
+
+            optimizer.zero_grad()
+            l.backward()
+            optimizer.step()
+            if (batch_i + 1) * batch_size % 100 == 0:
+                ls.append(eval_loss())
+    # 打印结果和作图
+    print('loss: %f, %f sec per epoch' % (ls[-1], time.time() - start))
+    plt.plot(np.linspace(0, num_epochs, len(ls)), ls)
+    plt.xlabel('epoch')
+    plt.ylabel('loss')
+    plt.show() 
+***************************************
+Example 52
+Project: deep-learning-note	Author: wdxtub	File: 38_gradient_descent.py	
+def show_trace(res):
+    n = max(abs(min(res)), abs(max(res)), 10)
+    f_line = np.arange(-n, n, 0.1)
+    plt.plot(f_line, [x * x for x in f_line])
+    plt.plot(res, [x * x for x in res], '-o')
+    plt.xlabel('x')
+    plt.ylabel('f(x)')
+    plt.show() 
+***************************************
+Example 53
+Project: deep-learning-note	Author: wdxtub	File: 38_gradient_descent.py	
+def show_trace_2d(f, results):
+    plt.plot(*zip(*results), '-o', color='#ff7f0e')
+    x1, x2 = np.meshgrid(np.arange(-5.5, 1.0, 0.1), np.arange(-3.0, 1.0, 0.1))
+    plt.contour(x1, x2, f(x1, x2), colors='#1f77b4')
+    plt.xlabel('x1')
+    plt.ylabel('x2')
+    plt.show() 
+***************************************
+Example 54
+Project: keras-anomaly-detection	Author: chen0040	File: plot_utils.py	
+def plot_training_history(history):
+    if history is None:
+        return
+    plt.plot(history['loss'])
+    plt.plot(history['val_loss'])
+    plt.title('model loss')
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'test'], loc='upper right')
+    plt.show() 
+***************************************
+Example 55
+Project: keras-anomaly-detection	Author: chen0040	File: plot_utils.py	
+def visualize_reconstruction_error(reconstruction_error, threshold):
+    plt.plot(reconstruction_error, marker='o', ms=3.5, linestyle='',
+             label='Point')
+
+    plt.hlines(threshold, xmin=0, xmax=len(reconstruction_error)-1, colors="r", zorder=100, label='Threshold')
+    plt.legend()
+    plt.title("Reconstruction error")
+    plt.ylabel("Reconstruction error")
+    plt.xlabel("Data point index")
+    plt.show() 
+***************************************
+Example 56
+Project: spacesense	Author: spacesense-ai	File: training_data.py	
+def display_shp_polygon(self,file):
+        if file.split('.')[-1] == 'shp':
+            sf = shapefile.Reader(self.folder+'/'+file)
+            polygon = Polygon(sf.shape().points)
+            x,y = polygon.exterior.xy
+            plt.plot(x,y)
+            plt.xlim(sf.shape().bbox[0], sf.shape().bbox[2])
+            plt.show() 
+***************************************
+Example 57
+Project: helloworld	Author: pip-uninstaller-python	File: matplotlibTest.py	
+def main():
+    # line
+    x = np.linspace(-np.pi, np.pi, 256, endpoint=True)
+    c, s = np.cos(x), np.sin(x)
+    plt.figure(1)
+    plt.plot(x, c, color="blue", linewidth=1.0, linestyle="-", label="COS", alpha=0.5)  # 自变量， 因变量
+    plt.plot(x, s, "r.", label="SIN")  # 正弦  "-"/"r-"/"r."
+    plt.title("COS & SIN")
+    ax = plt.gca()
+    ax.spines["right"].set_color("none")
+    ax.spines["top"].set_color("none")
+    ax.spines["left"].set_position(("data", 0))  # 横轴位置
+    ax.spines["bottom"].set_position(("data", 0))  # 纵轴位置
+    ax.xaxis.set_ticks_position("bottom")
+    ax.yaxis.set_ticks_position("left")
+    plt.xticks([-np.pi, -np.pi / 2.0, np.pi / 2, np.pi],
+               [r'$-\pi/2$', r'$-\pi/2$', r'$0$', r'$+\pi/2$', r'$-\pi$'])
+    plt.yticks(np.linspace(-1, 1, 5, endpoint=True))
+    for label in ax.get_xticklabels() + ax.get_yticklabels():
+        label.set_fontsize(16)
+        label.set_bbox(dict(facecolor="white", edgecolor="None", alpha=0.2))
+    plt.legend(loc="upper left")  # 左上角的显示图标
+    plt.grid()  # 网格线
+    # plt.axis([-1, 1, -0.5, 1])  # 显示范围
+    plt.fill_between(x, np.abs(x) < 0.5, c, c < 0.5, color="green", alpha=0.25)
+    t = 1
+    plt.plot([t, t], [0, np.cos(t)], "y", linewidth=3, linestyle="--")
+    # 注释
+    plt.annotate("cos(1)", xy=(t, np.cos(1)), xycoords="data", xytext=(+10, +30),
+                 textcoords="offset points", arrowprops=dict(arrowstyle="->", connectionstyle="arc3, rad=.2"))
+    plt.show()
+
+
+# Scatter --> 散点图 
+***************************************
+Example 58
+Project: FCOS_GluonCV	Author: DetectionTeamUCAS	File: plot_history.py	
+def plot(self, labels=None, colors=None, y_lim=(0, 1),
+             save_path=None, legend_loc='upper right'):
+        r"""Update the training history
+
+        Parameters
+        ---------
+        labels: list of str
+            List of label names to plot.
+        colors: list of str
+            List of line colors.
+        save_path: str
+            Path to save the plot. Will plot to screen if is None.
+        legend_loc: str
+            location of legend. upper right by default.
+        """
+        import matplotlib.pyplot as plt
+
+        if labels is None:
+            labels = self.labels
+        n = len(labels)
+
+        line_lists = [None]*n
+        if colors is None:
+            colors = ['C'+str(i) for i in range(n)]
+        else:
+            assert len(colors) == n
+
+        plt.ylim(y_lim)
+        for i, lb in enumerate(labels):
+            line_lists[i], = plt.plot(list(range(self.epochs)),
+                                      self.history[lb],
+                                      colors[i],
+                                      label=lb)
+        plt.legend(tuple(line_lists), labels, loc=legend_loc)
+        if save_path is None:
+            plt.show()
+        else:
+            save_path = os.path.expanduser(save_path)
+            plt.savefig(save_path) 
+***************************************
+Example 59
+Project: DOTA_models	Author: ringringyi	File: plot_lfads.py	
+def all_plot(d, full_name="", exclude="", nspaces=0):
+  """Recursively plot all the LFADS model parameters in the nested
+  dictionary."""
+  for k, v in d.iteritems():
+    this_name = full_name+"/"+k
+    if isinstance(v, dict):
+      all_plot(v, full_name=this_name, exclude=exclude, nspaces=nspaces+4)
+    else:
+      if exclude == "" or exclude not in this_name:
+        _plot_item(v, name=k, full_name=full_name+"/"+k, nspaces=nspaces+4) 
+***************************************
+Example 60
+Project: order	Author: ipudu	File: plot.py	
+def plot_ionic(self):
+        """plot distribution"""
+
+        data1 = np.loadtxt(self.fprefix+'_'+self.taskname+'_ti.dat')
+        data2 = np.loadtxt(self.fprefix+'_'+self.taskname+'_iaafp.dat')
+
+        #plot setting
+        #plt.rcParams['font.family'] = 'serif'
+        #plt.rcParams['font.serif'] = 'Ubuntu'
+        #plt.rcParams['font.monospace'] = 'Ubuntu Mono'
+        plt.rcParams['font.size'] = 10
+        plt.rcParams['axes.labelsize'] = 10
+        #plt.rcParams['axes.labelweight'] = 'bold'
+        plt.rcParams['xtick.labelsize'] = 8
+        plt.rcParams['ytick.labelsize'] = 8
+        plt.rcParams['legend.fontsize'] = 10
+        plt.rcParams['figure.titlesize'] = 12
+
+        #clean last plot
+        plt.clf()
+
+        plt.xlabel("Simulation time(ps)")
+        plt.ylabel("Charge from ions crossing the plane (e)")
+
+        x1 = data1[:,0]
+        y1 = data1[:,1]
+
+        x2 = data2[:,0]
+        y2 = data2[:,1]
+
+
+        plt.plot(x1, y1, label='ti')
+        plt.plot(x2, y2, label='iaafp')
+        plt.legend()
+        
+        figure = self.fprefix + '_' + self.taskname.upper() + '.pdf'
+        plt.savefig(figure, bbox_inches="tight") 
+***************************************
+Example 61
+Project: ortholotree	Author: oxpeter	File: internal.py	
+def rank_scores(homologlist, thresh1=0, thresh2=None, genename=None, outfile=None, showplot=False):
+    yvalues = sorted([val[1] for val in homologlist.values()], reverse=True)
+    plt.plot(yvalues)
+    score_cutoff = thresh1 * max(yvalues)
+    sample_cutoff = sum(1 for s in yvalues if s >= thresh1 * max(yvalues))
+    plt.axhline( score_cutoff , color='r' )
+    if thresh2:
+        plt.axhline( thresh2 * max(yvalues) , color='r' )
+    plt.axvline( sample_cutoff -1 , color='g' )
+    plt.text(sample_cutoff + 1,score_cutoff + 10 , "(%d,%d)" % (sample_cutoff,score_cutoff) )
+    plt.xlabel("Gene rank")
+    plt.ylabel("Phmmer score")
+    plt.title("Ranking of phmmer scores for alignment with %s" % genename)
+    if outfile:
+        plt.savefig(outfile, format='png')
+    if showplot:
+        plt.show()
+    else:
+        plt.close() 
+***************************************
+Example 62
+Project: simulated-annealing-tsp	Author: chncyhn	File: visualize_tsp.py	
+def plotTSP(paths, points, num_iters=1):
+
+    """
+    path: List of lists with the different orders in which the nodes are visited
+    points: coordinates for the different nodes
+    num_iters: number of paths that are in the path list
+
+    """
+
+    # Unpack the primary TSP path and transform it into a list of ordered
+    # coordinates
+
+    x = []; y = []
+    for i in paths[0]:
+        x.append(points[i][0])
+        y.append(points[i][1])
+
+    plt.plot(x, y, 'co')
+
+    # Set a scale for the arrow heads (there should be a reasonable default for this, WTF?)
+    a_scale = float(max(x))/float(100)
+
+    # Draw the older paths, if provided
+    if num_iters > 1:
+
+        for i in range(1, num_iters):
+
+            # Transform the old paths into a list of coordinates
+            xi = []; yi = [];
+            for j in paths[i]:
+                xi.append(points[j][0])
+                yi.append(points[j][1])
+
+            plt.arrow(xi[-1], yi[-1], (xi[0] - xi[-1]), (yi[0] - yi[-1]),
+                    head_width = a_scale, color = 'r',
+                    length_includes_head = True, ls = 'dashed',
+                    width = 0.001/float(num_iters))
+            for i in range(0, len(x) - 1):
+                plt.arrow(xi[i], yi[i], (xi[i+1] - xi[i]), (yi[i+1] - yi[i]),
+                        head_width = a_scale, color = 'r', length_includes_head = True,
+                        ls = 'dashed', width = 0.001/float(num_iters))
+
+    # Draw the primary path for the TSP problem
+    plt.arrow(x[-1], y[-1], (x[0] - x[-1]), (y[0] - y[-1]), head_width = a_scale,
+            color ='g', length_includes_head=True)
+    for i in range(0,len(x)-1):
+        plt.arrow(x[i], y[i], (x[i+1] - x[i]), (y[i+1] - y[i]), head_width = a_scale,
+                color = 'g', length_includes_head = True)
+
+    #Set axis too slitghtly larger than the set of x and y
+    plt.xlim(min(x)*1.1, max(x)*1.1)
+    plt.ylim(min(y)*1.1, max(y)*1.1)
+    plt.show() 
+***************************************
+Example 63
+Project: PEAKachu	Author: tbischler	File: adaptive.py	
+def run_deseq2_analysis(self, size_factors, pairwise_replicates):
+        count_df = self._peak_df.loc[:, self._exp_lib_list +
+                                     self._ctr_lib_list]
+        deseq2_runner = DESeq2Runner(count_df)
+        result_df, self._size_factors = deseq2_runner.run_deseq2(
+            self._exp_lib_list, self._ctr_lib_list, size_factors,
+            pairwise_replicates)
+        # normalize counts
+        self._peak_df[self._lib_names_list] = self._peak_df[
+            self._lib_names_list].div(self._size_factors, axis='columns')
+        # append DESeq2 output
+        self._peak_df = pd.concat([self._peak_df, result_df], axis=1)
+        # write initial peaks
+        peak_columns = (["replicon",
+                         "peak_start",
+                         "peak_end",
+                         "peak_strand"] +
+                        [lib_name for lib_name in self._lib_dict] +
+                        ["baseMean",
+                         "log2FoldChange",
+                         "lfcSE",
+                         "stat",
+                         "pvalue",
+                         "padj"])
+        self._peak_df.loc[:, peak_columns].to_csv(
+            "{}/initial_peaks.csv".format(self._output_folder),
+            sep='\t', na_rep='NA', index=False, encoding='utf-8')
+        # filter peaks
+        print("* Filtering peaks...", flush=True)
+        sig_peak_df = self._filter_peaks(self._peak_df)
+        unsig_peak_df = self._peak_df[~self._peak_df.index.isin(
+            sig_peak_df.index)]
+        # plot peaks
+        print("* Plotting initial peaks...", flush=True)
+        t_start = time()
+        self._plot_initial_peaks(unsig_peak_df.baseMean,
+                                 np.power(2.0, unsig_peak_df.log2FoldChange),
+                                 sig_peak_df.baseMean,
+                                 np.power(2.0, sig_peak_df.log2FoldChange))
+        t_end = time()
+        print("Plotting took {} seconds.".format(t_end-t_start), flush=True)
+        self._peak_df = sig_peak_df 
+***************************************
+Example 64
+Project: PEAKachu	Author: tbischler	File: adaptive.py	
+def run_analysis_without_replicates(self, size_factors):
+        # check if size factors were defined and otherwise calculate them based
+        # on DESeq normalization
+        if size_factors is None:
+            deseq2_runner = DESeq2Runner(self._peak_df[self._lib_names_list])
+            self._size_factors = deseq2_runner.calc_size_factors()
+        else:
+            self._size_factors = size_factors
+        # normalize counts
+        self._peak_df[self._lib_names_list] = self._peak_df[
+            self._lib_names_list].div(self._size_factors, axis='columns')
+        # calculate base means for all peaks
+        self._peak_df["base_means"] = self._peak_df.loc[
+            :, self._lib_names_list].mean(axis=1)
+        # calculate fcs for all peaks
+        self._peak_df["fold_change"] = (
+            self._peak_df.loc[:, self._exp_lib_list].sum(axis=1) /
+            self._peak_df.loc[:, self._ctr_lib_list].sum(axis=1))
+        # write initial peaks
+        peak_columns = (["replicon",
+                         "peak_start",
+                         "peak_end",
+                         "peak_strand"] +
+                        [lib_name for lib_name in self._lib_dict] +
+                        ["base_means",
+                         "fold_change"])
+        self._peak_df.loc[:, peak_columns].to_csv(
+            "{}/initial_peaks.csv".format(self._output_folder),
+            sep='\t', na_rep='NA', index=False, encoding='utf-8')
+        # filter peaks
+        print("* Filtering peaks...", flush=True)
+        sig_peak_df = self._filter_peaks_without_replicates(self._peak_df)
+        unsig_peak_df = self._peak_df[~self._peak_df.index.isin(
+            sig_peak_df.index)]
+        # plot peaks
+        print("* Plotting initial peaks...", flush=True)
+        t_start = time()
+        self._plot_initial_peaks(unsig_peak_df.base_means,
+                                 unsig_peak_df.fold_change,
+                                 sig_peak_df.base_means,
+                                 sig_peak_df.fold_change)
+        t_end = time()
+        print("Plotting took {} seconds.".format(t_end-t_start), flush=True)
+        self._peak_df = sig_peak_df 
+***************************************
+Example 65
+Project: projection-methods	Author: akshayka	File: plot_residuals.py	
+def main():
+    parser = argparse.ArgumentParser()
+    # --- input/output --- #
+    parser.add_argument(
+        'data', metavar='D',
+        help=('glob matching pickled results to plot; results should be '
+        'generated by experiment.py'))
+    parser.add_argument(
+        '-o', '--output', type=str, default=None,
+        help=('output filename of plot (w/o extension); if None, plot is '
+        'shown but not saved.'))
+    # --- plot settings --- #
+    parser.add_argument(
+        '-t', '--title', type=str, default='Residuals for feasibility problem',
+        help='plot title')
+    args = vars(parser.parse_args())
+
+    if args['output'] is not None:
+        output_path = PosixPath(args['output'] + '.png')
+        if output_path.is_file():
+            raise ValueError('Output file %s already exists!' % str(output_path))
+
+    data_paths = [PosixPath(f) for f in glob(args['data'])]
+    data = []
+    for p in data_paths:
+        if not p.is_file():
+            raise ValueError('File %s does not exist.' % str(p))
+        with p.open('rb') as f:
+            data.append(cPickle.load(f))
+
+    plt.figure() 
+    max_its = 0
+    for d in data:
+        res = d['res']
+        res = [sum(r) for r in res]
+        if 0 in res:
+            res = [r + 1e-20 for r in res]
+        it = range(len(res))
+        if len(res) > max_its:
+            max_its = len(res)
+        plt.plot(it, res, label=d['name'])
+    plt.semilogy()
+    step = int(max_its / 10)
+    plt.xticks(range(0, max_its+1, step))
+    plt.title(args['title']) 
+    plt.ylabel('residual')
+    plt.xlabel('iterations')
+    plt.legend()
+
+    if args['output'] is not None:
+        plt.savefig(str(output_path))
+    else:
+        datacursor(formatter='{label}'.format)
+        plt.show() 
+***************************************
+Example 66
+Project: kipet	Author: salvadorgarciamunoz	File: data_tools.py	
+def basic_pca(dataFrame,n=None,with_plots=False):
+    """ Runs basic component analysis based on SVD
+    
+        Args:
+            dataFrame (DataFrame): spectral data
+            
+            n (int): number of largest singular-values
+            to plot
+            
+            with_plots (boolean): argument for files with plots due to testing
+
+        Returns:
+            None
+
+    """
+            
+    times = np.array(dataFrame.index)
+    lambdas = np.array(dataFrame.columns)
+    D = np.array(dataFrame)
+    #print("D shape: ", D.shape)
+    U, s, V = np.linalg.svd(D, full_matrices=True)
+    #print("U shape: ", U.shape)
+    #print("s shape: ", s.shape)
+    #print("V shape: ", V.shape)
+    #print("sigma/singular values", s)
+    if n == None:
+        print("WARNING: since no number of components is specified, all components are printed")
+        print("It is advised to select the number of components for n")
+        n_shape = s.shape
+        n = n_shape[0]
+        
+    u_shape = U.shape
+    #print("u_shape[0]",u_shape[0])
+    n_l_vector = n if u_shape[0]>=n else u_shape[0]
+    n_singular = n if len(s)>=n else len(s)
+    idxs = range(n_singular)
+    vals = [s[i] for i in idxs]
+    v_shape = V.shape
+    n_r_vector = n if v_shape[0]>=n else v_shape[0]
+    
+    if with_plots:
+        for i in range(n_l_vector):
+            plt.plot(times,U[:,i])
+        plt.xlabel("time")
+        plt.ylabel("Components U[:,i]")
+        plt.show()
+        
+        plt.semilogy(idxs,vals,'o')
+        plt.xlabel("i")
+        plt.ylabel("singular values")
+        plt.show()
+        
+        for i in range(n_r_vector):
+            plt.plot(lambdas,V[i,:])
+        plt.xlabel("wavelength")
+        plt.ylabel("Components V[i,:]")
+        plt.show() 
+***************************************
+Example 67
+Project: wikilinks	Author: trovdimi	File: structural_statistics.py	
+def plot_degree():
+    # wikipedia  graph  structural statistics
+    print 'before load'
+    network = load_graph("output/wikipedianetwork.xml.gz")
+    print 'after load'
+
+    print 'before load'
+    network_transitions = load_graph("output/transitionsnetwork.xml.gz")
+    print 'after load'
+    out_hist = vertex_hist(network, "out")
+    fig, ax = plt.subplots()
+
+    ax.set_yscale('log')
+    ax.set_xscale('log')
+    ax.plot(out_hist[1][:-1], out_hist[0], marker='o', markersize=3, label='wikipedia', color='b')
+
+    out_hist = vertex_hist(network_transitions, "out")
+    ax.plot(out_hist[1][:-1], out_hist[0], marker='o', markersize=3, label='transitions', color='r')
+    plt.legend(fancybox=True, loc='upper right', ncol=1, prop={'size':4}, numpoints=1, handlelength=0)
+    ax.set_ylim([10**0, 10**6])
+    ax.set_xlabel('Out-degree')
+    ax.set_ylabel('Frequency')
+    fig.tight_layout()
+    fig.savefig('output/wikipedia-transitions-outdegree.pdf')
+
+    out_hist = vertex_hist(network, "in")
+    fig, ax = plt.subplots()
+
+    ax.set_yscale('log')
+    ax.set_xscale('log')
+    ax.plot(out_hist[1][:-1], out_hist[0], marker='o', markersize=3, label='wikipedia', color='b')
+
+    out_hist = vertex_hist(network_transitions, "in")
+    ax.plot(out_hist[1][:-1], out_hist[0], marker='o', markersize=3, label='transitions', color='r')
+    plt.legend(fancybox=True, loc='upper right', ncol=1, prop={'size':4}, numpoints=1, handlelength=0)
+    ax.set_ylim([10**0, 10**6])
+    ax.set_xlabel('In-degree')
+    ax.set_ylabel('Frequency')
+    fig.tight_layout()
+    fig.savefig('output/wikipedia-transitions-indegree.pdf')
+
+    out_hist = vertex_hist(network, "total")
+    fig, ax = plt.subplots()
+
+    ax.set_yscale('log')
+    ax.set_xscale('log')
+    ax.plot(out_hist[1][:-1], out_hist[0], marker='o', markersize=3, label='wikipeida', color='b')
+
+    out_hist = vertex_hist(network_transitions, "total")
+    ax.plot(out_hist[1][:-1], out_hist[0], marker='o', markersize=3, label='transitions', color='r')
+    plt.legend(fancybox=True, loc='upper right', ncol=1, prop={'size':4}, numpoints=1, handlelength=0)
+    ax.set_ylim([10**0, 10**6])
+    ax.set_xlabel('Degree')
+    ax.set_ylabel('Frequency')
+    fig.tight_layout()
+    fig.savefig('output/wikipedia-transitions-degree.pdf') 
+***************************************
+Example 68
+Project: wikilinks	Author: trovdimi	File: click_distributions.py	
+def plot_counts_category_distributions_ccdf():
+    category_distributions = read_pickle(HOME+'output/category_counts_distribution.obj')
+
+    for  i in category_distributions.values():
+        print len(i)
+
+    colors= {'lead':'r','infobox':'b', 'body':'g',  'left-body':'m','navbox':'c', 'counts':'k'}
+
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+    for category in ['lead', 'infobox', 'body', 'left-body', 'navbox', 'counts']:
+
+        data = category_distributions[category]
+        data = [x[0] for x in data]
+        powerlaw.plot_ccdf(data, ax, label=category,color=colors[category])
+    # further plotting
+    ax.set_xlabel("Number of clicks n")
+    ax.set_ylabel("Pr(X>=n)")
+    plt.legend(fancybox=True, loc=3, ncol=2, prop={'size':4})
+    #leg = plt.gca().get_legend()
+    #ltext  = leg.get_texts()  # all the text.Text instance in the legend
+    #llines = leg.get_lines()
+    #plt.setp(ltext, fontsize='small')    # the legend text fontsize
+    #plt.setp(llines, linewidth=1)
+    plt.tight_layout()
+    plt.savefig('output/category_counts_distributions.pdf')
+
+    data = category_distributions['counts']
+    data = [int(x[0]) for x in data]
+
+    hist, bin_edges = np.histogram(data, 100, density=True)
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.plot( bin_edges[:-1],hist, marker='o')
+    ax.set_xlabel('#Counts')
+    ax.set_ylabel('#Pages')
+    ax.set_yscale('log')
+    ax.set_xscale('log')
+    plt.legend(fancybox=True, loc=3,  prop={'size':4})
+    plt.tight_layout()
+    plt.savefig('output/counts_distribution.pdf') 
+***************************************
+Example 69
+Project: mun	Author: hmlON	File: views.py	
+def admin_dashboard(request):
+    from django.contrib.auth.models import User
+    from integrations.models import Integration
+    from notifications.models import Notification
+    from django.db.models import Count
+    import matplotlib.pyplot as plt
+    import mpld3
+
+    total_users_count = User.objects.count()
+
+    total_integrations_count = Integration.objects.count()
+    integrations_by_identifier = Integration.objects.values('identifier').annotate(count=Count('identifier'))
+
+    x = [integration['count'] for integration in integrations_by_identifier]
+    labels = [integration['identifier'] for integration in integrations_by_identifier]
+    fig = plt.figure(figsize=(5, 5))
+    positions = range(len(x))
+    plt.bar(positions, x, color='lightblue')
+    plt.xticks(positions, labels)
+    integrations_by_identifier_chart = mpld3.fig_to_html(fig)
+
+    total_notifications_count = Notification.objects.count()
+    notifications_by_identifier = Notification.objects.values('channel').annotate(count=Count('channel'))
+
+    x = [notification['count'] for notification in notifications_by_identifier]
+    labels = [notification['channel'] for notification in notifications_by_identifier]
+    fig = plt.figure(figsize=(5, 5))
+    positions = range(len(x))
+    plt.bar(positions, x, color='lightblue')
+    plt.xticks(positions, labels)
+    notifications_by_identifier_chart = mpld3.fig_to_html(fig)
+
+    context = {
+        'total_users_count': total_users_count,
+        'total_integrations_count': total_integrations_count,
+        'integrations_by_identifier_chart': integrations_by_identifier_chart,
+        'total_notifications_count': total_notifications_count,
+        'notifications_by_identifier_chart': notifications_by_identifier_chart,
+        # 'fig': g,
+    }
+    return render(request, 'admin/dashboard.html', context)
+
+    # import matplotlib.pyplot as plt, mpld3
+    # from django.http import HttpResponse
+
+    # fig = plt.figure()
+    # plt.plot([1,2,3,4])
+    # g = mpld3.fig_to_html(fig)
+    # return HttpResponse(g) 
+***************************************
+Example 70
+Project: OpenAPS	Author: medicinexlab	File: mlalgorithm.py	
+def analyze_ml_data(actual_bg_array, bg_prediction, bg_time_array, show_pred_plot, save_pred_plot, show_clarke_plot, save_clarke_plot, id_str, algorithm_str, minutes_str):
+    """
+    Function to analyze and plot the machine learning data. It takes in the actual_bg_array and the bg_prediction and compares
+    the two with various analysis methods, such as root mean squared error, mean absolute error,
+    R^2 coefficient of determination, and clarke error grid analysis.
+
+    Input:      actual_bg_array                 The array of actual bg values
+                bg_prediction                   The array of prediction bg values
+                bg_time_array                   The array of times corresponding to bg_prediction
+                show_pred_plot                  Boolean to show the prediction plot
+                save_pred_plot                  Boolean to save the prediction plot
+                show_clarke_plot                Boolean to show the clarke error grid
+                save_clarke_plot                Boolean to save the clarke error grid
+                id_str                          String of the ID
+                algorithm_str                   String of the algorithm name
+                minutes_str                     String of the number of minutes (both prediction and data minutes)
+.
+    Output:     None
+    Usage:      analyze_ml_data(actual_bg_test_array, test_prediction, True, False, True, False, "00000001", "Linear Regression", "Pred30Data5")
+    """
+
+    #Root mean squared error
+    rms = math.sqrt(metrics.mean_squared_error(actual_bg_array, bg_prediction))
+    print "                Root Mean Squared Error: " + str(rms)
+    print "                Mean Absolute Error: " + str(metrics.mean_absolute_error(actual_bg_array, bg_prediction))
+    print "                R^2 Coefficient of Determination: " + str(metrics.r2_score(actual_bg_array, bg_prediction))
+
+    plot, zone = ClarkeErrorGrid.clarke_error_grid(actual_bg_array, bg_prediction, id_str + " " + algorithm_str + " " + minutes_str)
+    print "                Percent A:{}".format(float(zone[0]) / (zone[0] + zone[1] + zone[2] + zone[3] + zone[4]))
+    print "                Percent C, D, E:{}".format(float(zone[2] + zone[3] + zone[4])/ (zone[0] + zone[1] + zone[2] + zone[3] + zone[4]))
+    print "                Zones are A:{}, B:{}, C:{}, D:{}, E:{}\n".format(zone[0],zone[1],zone[2],zone[3],zone[4])
+    if save_clarke_plot: plt.savefig(id_str + algorithm_str.replace(" ", "") + minutes_str + "clarke.png")
+    if show_clarke_plot: plot.show()
+
+    plt.clf()
+    plt.plot(bg_time_array, actual_bg_array, label="Actual BG", color='black', linestyle='-')
+    plt.plot(bg_time_array, bg_prediction, label="BG Prediction", color='black', linestyle=':')
+    plt.title(id_str + " " + algorithm_str + " " + minutes_str + " BG Analysis")
+    plt.ylabel("Blood Glucose Level (mg/dl)")
+    plt.xlabel("Time (minutes)")
+    plt.legend(loc='upper left')
+
+    # SHOW/SAVE PLOT DEPENDING ON THE BOOLEAN PARAMETER
+    if save_pred_plot: plt.savefig(id_str + algorithm_str.replace(" ","") + minutes_str + "plot.png")
+    if show_pred_plot: plt.show()
+
+
+#Preprocesses the data by the standard scaler relative to the train_data_matrix 
+***************************************
+Example 71
+Project: FRIDA	Author: LCAV	File: plotters.py	
+def plt_planewave(y_mic_noiseless, y_mic_noisy, mic=0, save_fig=False, **kwargs):
+    """
+    plot received planewaves at microhpnes
+    :param y_mic_noiseless: the noiseless planewave
+    :param y_mic_noisy: the noisy planewave
+    :param mic: planewave at which microphone to plot
+    :return:
+    """
+    if 'SNR' in kwargs:
+        SNR = kwargs['SNR']
+    else:
+        SNR = 20 * np.log10(linalg.norm(y_mic_noiseless[mic, :].flatten('F')) /
+                            linalg.norm((y_mic_noisy[mic, :] - y_mic_noiseless[mic, :]).flatten('F')))
+    plt.figure(figsize=(6, 3), dpi=90)
+    ax1 = plt.axes([0.1, 0.53, 0.85, 0.32])
+    plt.plot(np.real(y_mic_noiseless[mic, :]), color=[0, 0.447, 0.741],
+             linestyle='-', linewidth=1.5, label='noiseless', alpha=0.6)
+    plt.plot(np.real(y_mic_noisy[mic, :]), color=[0.850, 0.325, 0.098],
+             linestyle='-', linewidth=1.5, label='noisy', alpha=0.6)
+
+    plt.xlim([0, y_mic_noisy.shape[1] - 1])
+    # plt.xlabel(r'time snapshot', fontsize=11)
+    plt.ylabel(r'$\Re\{y(\omega, t)\}$', fontsize=11)
+
+    ax1.yaxis.major.locator.set_params(nbins=5)
+    plt.legend(framealpha=0.5, scatterpoints=1, loc=0,
+               fontsize=9, ncol=2, handletextpad=.2,
+               columnspacing=1.7, labelspacing=0.1)
+
+    plt.title(r'received planewaves at microphe {0} ($\mbox{{SNR}} = {1:.1f}$dB)'.format(repr(mic), SNR),
+              fontsize=11)
+
+    ax2 = plt.axes([0.1, 0.14, 0.85, 0.32])
+    plt.plot(np.imag(y_mic_noiseless[mic, :]), color=[0, 0.447, 0.741],
+             linestyle='-', linewidth=1.5, label='noiseless', alpha=0.6)
+    plt.plot(np.imag(y_mic_noisy[mic, :]), color=[0.850, 0.325, 0.098],
+             linestyle='-', linewidth=1.5, label='noisy', alpha=0.6)
+
+    plt.xlim([0, y_mic_noisy.shape[1] - 1])
+    plt.xlabel(r'time snapshot', fontsize=11)
+    plt.ylabel(r'$\Im\{y(\omega, t)\}$', fontsize=11)
+
+    ax2.yaxis.major.locator.set_params(nbins=5)
+
+    if save_fig:
+        if 'file_name' in kwargs:
+            file_name = kwargs['file_name']
+        else:
+            file_name = 'planewave_mic{0}.pdf'.format(repr(mic))
+        plt.savefig(file_name, format='pdf', dpi=300, transparent=True) 
+***************************************
+Example 72
+Project: mmdetection	Author: open-mmlab	File: analyze_logs.py	
+def plot_curve(log_dicts, args):
+    if args.backend is not None:
+        plt.switch_backend(args.backend)
+    sns.set_style(args.style)
+    # if legend is None, use {filename}_{key} as legend
+    legend = args.legend
+    if legend is None:
+        legend = []
+        for json_log in args.json_logs:
+            for metric in args.keys:
+                legend.append('{}_{}'.format(json_log, metric))
+    assert len(legend) == (len(args.json_logs) * len(args.keys))
+    metrics = args.keys
+
+    num_metrics = len(metrics)
+    for i, log_dict in enumerate(log_dicts):
+        epochs = list(log_dict.keys())
+        for j, metric in enumerate(metrics):
+            print('plot curve of {}, metric is {}'.format(
+                args.json_logs[i], metric))
+            if metric not in log_dict[epochs[0]]:
+                raise KeyError('{} does not contain metric {}'.format(
+                    args.json_logs[i], metric))
+
+            if 'mAP' in metric:
+                xs = np.arange(1, max(epochs) + 1)
+                ys = []
+                for epoch in epochs:
+                    ys += log_dict[epoch][metric]
+                ax = plt.gca()
+                ax.set_xticks(xs)
+                plt.xlabel('epoch')
+                plt.plot(xs, ys, label=legend[i * num_metrics + j], marker='o')
+            else:
+                xs = []
+                ys = []
+                num_iters_per_epoch = log_dict[epochs[0]]['iter'][-1]
+                for epoch in epochs:
+                    iters = log_dict[epoch]['iter']
+                    if log_dict[epoch]['mode'][-1] == 'val':
+                        iters = iters[:-1]
+                    xs.append(
+                        np.array(iters) + (epoch - 1) * num_iters_per_epoch)
+                    ys.append(np.array(log_dict[epoch][metric][:len(iters)]))
+                xs = np.concatenate(xs)
+                ys = np.concatenate(ys)
+                plt.xlabel('iter')
+                plt.plot(
+                    xs, ys, label=legend[i * num_metrics + j], linewidth=0.5)
+            plt.legend()
+        if args.title is not None:
+            plt.title(args.title)
+    if args.out is None:
+        plt.show()
+    else:
+        print('save curve to: {}'.format(args.out))
+        plt.savefig(args.out)
+        plt.cla() 
+***************************************
+Example 73
+Project: Kaggle-Statoil-Challenge	Author: adodd202	File: main-tf-audio.py	
+def plot_curve(self, save_path, args, model):
+        title = 'PyTorch Model:' + str((type(model).__name__)).upper() + ', DataSet:' + str(args.dataset).upper() + ',' \
+                + 'Params: %.2fM' % (
+            sum(p.numel() for p in model.parameters()) / 1000000.0) + ', Seed: %.2f' % args.manualSeed
+        dpi = 80
+        width, height = 1200, 800
+        legend_fontsize = 10
+        scale_distance = 48.8
+        figsize = width / float(dpi), height / float(dpi)
+
+        fig = plt.figure(figsize=figsize)
+        x_axis = np.array([i for i in range(self.total_epoch)])  # epochs
+        y_axis = np.zeros(self.total_epoch)
+
+        plt.xlim(0, self.total_epoch)
+        plt.ylim(0, 1.0)
+        interval_y = 0.05 / 3.0
+        interval_x = 1
+        plt.xticks(np.arange(0, self.total_epoch + interval_x, interval_x))
+        plt.yticks(np.arange(0, 1.0 + interval_y, interval_y))
+        plt.grid()
+        plt.title(title, fontsize=18)
+        plt.xlabel('EPOCH', fontsize=16)
+        plt.ylabel('LOSS/ACC', fontsize=16)
+
+        y_axis[:] = self.epoch_accuracy[:, 0] / 100.0
+        plt.plot(x_axis, y_axis, color='g', linestyle='-', label='tr-accuracy/100', lw=2)
+        plt.legend(loc=4, fontsize=legend_fontsize)
+
+        y_axis[:] = self.epoch_accuracy[:, 1] / 100.0
+        plt.plot(x_axis, y_axis, color='y', linestyle='-', label='val-accuracy/100', lw=2)
+        plt.legend(loc=4, fontsize=legend_fontsize)
+
+        y_axis[:] = self.epoch_losses[:, 0]
+        plt.plot(x_axis, y_axis, color='r', linestyle=':', label='tr-loss', lw=2)
+        plt.legend(loc=4, fontsize=legend_fontsize)
+
+        y_axis[:] = self.epoch_losses[:, 1]
+        plt.plot(x_axis, y_axis, color='b', linestyle=':', label='val-loss', lw=4)
+        plt.legend(loc=4, fontsize=legend_fontsize)
+
+        if save_path is not None:
+            fig.savefig(save_path, dpi=dpi, bbox_inches='tight')
+            # print('---- save figure {} into {}'.format(title, save_path))
+        plt.close(fig) 
+***************************************
+Example 74
+Project: Kaggle-Statoil-Challenge	Author: adodd202	File: utils.py	
+def plot_curve(self, save_path, args, model):
+        title = 'PyTorch-Ensembler:' + str((type(model).__name__)).upper() + ',LR:' + str(args.lr) +  ',DataSet:' + str(args.dataset).upper() + ',' + '\n'\
+                + ',Params: %.2fM' % (sum(p.numel() for p in model.parameters()) / 1000000.0) + ',Seed: %.2f' % args.manualSeed + \
+                ",Torch: {}".format(torch.__version__) + ", Batch:{}".format(args.batch_size)
+
+        dpi = 80
+        width, height = 1200, 800
+        legend_fontsize = 14
+        scale_distance = 48.8
+        figsize = width / float(dpi), height / float(dpi)
+
+        fig = plt.figure(figsize=figsize)
+        x_axis = np.array([i for i in range(self.total_epoch)])  # epochs
+        y_axis = np.zeros(self.total_epoch)
+
+        plt.xlim(0, self.total_epoch)
+        plt.ylim(0, 1.0)
+        interval_y = 0.05 / 3.0
+        interval_x = 1
+        plt.xticks(np.arange(0, self.total_epoch + interval_x, interval_x))
+        plt.yticks(np.arange(0, 1.0 + interval_y, interval_y))
+        plt.grid()
+        plt.title(title, fontsize=18)
+        plt.xlabel('EPOCH', fontsize=16)
+        plt.ylabel('LOSS/ACC', fontsize=16)
+
+        y_axis[:] = self.epoch_accuracy[:, 0] / 100.0
+        plt.plot(x_axis, y_axis, color='g', linestyle='-', label='tr-accuracy/100', lw=2)
+        plt.legend(loc=4, fontsize=legend_fontsize)
+
+        y_axis[:] = self.epoch_accuracy[:, 1] / 100.0
+        plt.plot(x_axis, y_axis, color='y', linestyle='-', label='val-accuracy/100', lw=2)
+        plt.legend(loc=4, fontsize=legend_fontsize)
+
+        y_axis[:] = self.epoch_losses[:, 0]
+        plt.plot(x_axis, y_axis, color='r', linestyle=':', label='tr-loss', lw=2)
+        plt.legend(loc=4, fontsize=legend_fontsize)
+
+        y_axis[:] = self.epoch_losses[:, 1]
+        plt.plot(x_axis, y_axis, color='b', linestyle=':', label='val-loss', lw=4)
+        plt.legend(loc=4, fontsize=legend_fontsize)
+
+        if save_path is not None:
+            fig.savefig(save_path, dpi=dpi, bbox_inches='tight')
+            # print('---- save figure {} into {}'.format(title, save_path))
+        plt.close(fig) 
+***************************************
+Example 75
+Project: neural-fingerprinting	Author: StephanZheng	File: utils.py	
+def linear_extrapolation_plot(log_prob_adv_array, y, file_name,
+                              min_epsilon=-10, max_epsilon=10,
+                              num_points=21):
+    """Generate linear extrapolation plot.
+
+    Args:
+        log_prob_adv_array: Numpy array containing log probabilities
+        y: Tf placeholder for the labels
+        file_name: Plot filename
+        min_epsilon: Minimum value of epsilon over the interval
+        max_epsilon: Maximum value of epsilon over the interval
+        num_points: Number of points used to interpolate
+    """
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+
+    figure = plt.figure()
+    figure.canvas.set_window_title('Cleverhans: Linear Extrapolation Plot')
+
+    correct_idx = np.argmax(y, axis=0)
+    fig = plt.figure()
+    plt.xlabel('Epsilon')
+    plt.ylabel('Logits')
+    x_axis = np.linspace(min_epsilon, max_epsilon, num_points)
+    plt.xlim(min_epsilon - 1, max_epsilon + 1)
+    for i in xrange(y.shape[0]):
+        if i == correct_idx:
+            ls = '-'
+            linewidth = 5
+        else:
+            ls = '--'
+            linewidth = 2
+        plt.plot(
+            x_axis,
+            log_prob_adv_array[:, i],
+            ls=ls,
+            linewidth=linewidth,
+            label='{}'.format(i))
+    plt.legend(loc='best', fontsize=14)
+    plt.show()
+    fig.savefig(file_name)
+    plt.clf()
+    return figure 
+***************************************
+Example 76
+Project: GraphIsomorphismNetwork	Author: yukiTakezawa	File: main.py	
+def main():
+    epoch_size = 1500
+    train_data_size = 912
+    test_data_size = 200
+    accuracy_list = []
+    
+    device = torch.device('cuda')
+    data, labels = load_data()
+    processed_data = preproceccing(data)
+    
+    model = Model().to(device)
+    optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
+    criterion = nn.BCELoss()#nn.MSELoss()
+
+    torch.autograd.set_detect_anomaly(True)
+
+    # split data into train data and test data
+    shuffled_data, shuffled_labels = shuffle_data(processed_data, labels)
+    test_data = shuffled_data[0:200]
+    test_labels = shuffled_labels[0:200]
+    train_data = shuffled_data[200:1112]
+    train_labels = shuffled_labels[200:1112]
+
+    # traning
+    for i in range(epoch_size):
+
+        shuffled_data, shuffled_labels = shuffle_data(train_data, train_labels)
+        
+        for j in range(train_data_size):
+            with torch.autograd.detect_anomaly():
+                optimizer.zero_grad()
+                output = model(shuffled_data[j])
+                #print(output, shuffled_labels[j])
+                loss = criterion(output, shuffled_labels[j])
+                loss.backward()
+                optimizer.step()
+                
+        accuracy = calc_accuracy(model, test_data, test_labels, test_data_size)
+        accuracy_list.append(accuracy)
+        print(accuracy)
+        print("learnig %d epoch" % (i))
+    print("finished learning \n best accuracy is %f" % (max(accuracy_list)))
+
+
+    plt.plot(accuracy_list)
+    plt.show()
+    print("end") 
+***************************************
+Example 77
+Project: dynamic-training-with-apache-mxnet-on-aws	Author: awslabs	File: coco.py	
+def showAnns(self, anns):
+        """
+        Display the specified annotations.
+        :param anns (array of object): annotations to display
+        :return: None
+        """
+        if len(anns) == 0:
+            return 0
+        if 'segmentation' in anns[0] or 'keypoints' in anns[0]:
+            datasetType = 'instances'
+        elif 'caption' in anns[0]:
+            datasetType = 'captions'
+        else:
+            raise Exception('datasetType not supported')
+        if datasetType == 'instances':
+            ax = plt.gca()
+            ax.set_autoscale_on(False)
+            polygons = []
+            color = []
+            for ann in anns:
+                c = (np.random.random((1, 3))*0.6+0.4).tolist()[0]
+                if 'segmentation' in ann:
+                    if type(ann['segmentation']) == list:
+                        # polygon
+                        for seg in ann['segmentation']:
+                            poly = np.array(seg).reshape((int(len(seg)/2), 2))
+                            polygons.append(Polygon(poly))
+                            color.append(c)
+                    else:
+                        # mask
+                        raise NotImplementedError("maskUtils disabled!")
+                if 'keypoints' in ann and type(ann['keypoints']) == list:
+                    # turn skeleton into zero-based index
+                    sks = np.array(self.loadCats(ann['category_id'])[0]['skeleton'])-1
+                    kp = np.array(ann['keypoints'])
+                    x = kp[0::3]
+                    y = kp[1::3]
+                    v = kp[2::3]
+                    for sk in sks:
+                        if np.all(v[sk]>0):
+                            plt.plot(x[sk],y[sk], linewidth=3, color=c)
+                    plt.plot(x[v>0], y[v>0],'o',markersize=8, markerfacecolor=c, markeredgecolor='k',markeredgewidth=2)
+                    plt.plot(x[v>1], y[v>1],'o',markersize=8, markerfacecolor=c, markeredgecolor=c, markeredgewidth=2)
+            p = PatchCollection(polygons, facecolor=color, linewidths=0, alpha=0.4)
+            ax.add_collection(p)
+            p = PatchCollection(polygons, facecolor='none', edgecolors=color, linewidths=2)
+            ax.add_collection(p)
+        elif datasetType == 'captions':
+            for ann in anns:
+                print(ann['caption']) 
+***************************************
+Example 78
+Project: DensityPeakCluster	Author: lanbing510	File: plot_utils.py	
+def plot_scatter_diagram(which_fig, x, y, x_label = 'x', y_label = 'y', title = 'title', style_list = None):
+	'''
+	Plot scatter diagram
+
+	Args:
+		which_fig  : which sub plot
+		x          : x array
+		y          : y array
+		x_label    : label of x pixel
+		y_label    : label of y pixel
+		title      : title of the plot
+	'''
+	styles = ['k', 'g', 'r', 'c', 'm', 'y', 'b', '#9400D3','#C0FF3E']
+	assert len(x) == len(y)
+	if style_list != None:
+		assert len(x) == len(style_list) and len(styles) >= len(set(style_list))
+	plt.figure(which_fig)
+	plt.clf()
+	if style_list == None:
+		plt.plot(x, y, color=styles[0], linestyle='.', marker='.')
+	else:
+		clses = set(style_list)
+		xs, ys = {}, {}
+		for i in xrange(len(x)):
+			try:
+				xs[style_list[i]].append(x[i])
+				ys[style_list[i]].append(y[i])
+			except KeyError:
+				xs[style_list[i]] = [x[i]]
+				ys[style_list[i]] = [y[i]]
+		added = 1
+		for idx, cls in enumerate(clses):
+			if cls == -1:
+				style = styles[0]
+				added = 0
+			else:
+				style = styles[idx + added]
+			plt.plot(xs[cls], ys[cls], color=style, linestyle='.', marker='.')
+	plt.title(title)
+	plt.xlabel(x_label)
+	plt.ylabel(y_label)
+	plt.show() 
+***************************************
+Example 79
+Project: cvpr2018-hnd	Author: kibok90	File: test.py	
+def print_results(work_name, results, save_path, hierarchical_measure=False, start_time=time.time()):
+
+    if hierarchical_measure:
+        mtypes = ['acc', 'HF']
+    else:
+        mtypes = ['acc']
+    
+    print(save_path)
+    print('{work_name}; '.format(work_name=work_name), end='')
+    print('{time:8.3f} s'.format(time=time.time()-start_time))
+    for m, mtype in enumerate(mtypes):
+        print('bias: {res:7.4f}; '.format(res=results['acc']['g_bias']), end='')
+        print('{mtype:4s}'.format(mtype=mtype), end='')
+        print('known: {res:5.2f}; '.format(res=results[mtype]['g_known']*100.), end='')
+        print('novel: {res:5.2f}; '.format(res=results[mtype]['g_novel']*100.), end='')
+        if mtype == 'acc':
+            print('auc  : {res:5.2f}; '.format(res=results[mtype]['auc']*100.))
+        else:
+            print('hmean: {res:5.2f}; '.format(res=results[mtype]['g_harmonic']*100.))
+    
+        # plot known vs. novel
+        plt.figure(m)
+        plt.plot(results[mtype]['known'], results[mtype]['novel'], 'k.-')
+        if mtype == 'HE':
+            plt.xticks(np.arange(0., 11., 1.))
+            plt.yticks(np.arange(0., 11., 1.))
+            plt.axis([0., 10., 0., 10.])
+        else:
+            plt.xticks(np.arange(0., 1.1, .1))
+            plt.yticks(np.arange(0., 1.1, .1))
+            plt.axis([0., 1., 0., 1.])
+        plt.grid()
+        plt.xlabel('known class accuracy')
+        plt.ylabel('novel class accuracy')
+        plt.title('known: {res:5.2f}; '.format(res=results[mtype]['g_known']*100.) + \
+                  'novel: {res:5.2f}; '.format(res=results[mtype]['g_novel']*100.) + \
+                  'hmean: {res:5.2f}; '.format(res=results[mtype]['g_harmonic']*100.) + \
+                  'auc  : {res:5.2f}; '.format(res=results[mtype]['auc']*100.)
+                 )
+        plt.savefig(save_path + '_' + work_name + '_' + mtype + '.png')
+        plt.clf()
+        plt.close() 
+***************************************
+Example 80
+Project: order	Author: ipudu	File: plot.py	
+def plot_distribution(self):
+        """plot distribution"""
+
+        data = np.loadtxt(self.fprefix+'_'+self.taskname+'.dat')
+        #plot setting
+        #plt.rcParams['font.family'] = 'serif'
+        #plt.rcParams['font.serif'] = 'Ubuntu'
+        #plt.rcParams['font.monospace'] = 'Ubuntu Mono'
+        plt.rcParams['font.size'] = 10
+        plt.rcParams['axes.labelsize'] = 10
+        #plt.rcParams['axes.labelweight'] = 'bold'
+        plt.rcParams['xtick.labelsize'] = 8
+        plt.rcParams['ytick.labelsize'] = 8
+        plt.rcParams['legend.fontsize'] = 10
+        plt.rcParams['figure.titlesize'] = 12
+
+        #clean last plot
+        plt.figure()
+        plt.clf()
+
+        if self.taskname == 'oto':
+            plt.xlabel("Q")
+            plt.ylabel(r"$P(Q)  (arb. unit)$")
+
+        if self.taskname == 'tto':
+            plt.xlabel("Sk")
+            plt.ylabel(r"$P(Sk)  (arb. unit)$")
+         
+        if self.taskname == 'avc':
+            plt.xlabel("Asphericity")
+            plt.ylabel(r"$P(Asphericity)  (arb. unit)$")
+        
+        if self.taskname == 'msd':
+            plt.xlabel('t')
+            plt.ylabel('<r^2>')
+
+        x = data[:,0]
+        y = data[:,1]
+
+        plt.plot(x,y,linewidth=2.0)
+        
+        figure = self.fprefix + '_' + self.taskname + '.pdf'
+        plt.savefig(figure, bbox_inches="tight") 
