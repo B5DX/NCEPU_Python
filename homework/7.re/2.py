@@ -7,42 +7,44 @@ import re
 import os
 os.chdir(os.path.dirname(__file__))
 
+
 def main():
-    outF = open('test.txt', 'w', encoding='utf-8')
-    pat = []
-    pat.append(re.compile(r'<a href="(.*)">.*(企业介绍|关于我们|企业发展|发展历史|企业概况).*</a>'))
-    pat.append(re.compile(r'^(http|https):.*\.html'))
-    pat.append(re.compile(r'^.*\.html'))
+    output_file = open('about.txt', 'w', encoding='utf-8')
+    cnt = 0
     with open('output.txt', 'r', encoding='utf-8') as f:
         for ind, line in enumerate(f):
             line = line.strip()
-            getAbout(line, outF, pat)
-            if ind%50 == 0:
-                print(ind)
-            if ind > 1000:
-                break
-    outF.close()
+            try:
+                r = requests.get(line, timeout=(1, 1))
+                html = r.text
+                soup = BeautifulSoup(html, features='lxml')
+                for i in soup.find_all('a'):
+                    res = re.search(r"(我们|关于|介绍|历史|概况|企业)", str(i))
+                    if res is not None:
+                        url = i.attrs['href']
+                        if 'www.' in url:
+                            print(url)
+                            output_file.write(url + '\n')
+                        else:
+                            print(line + url)
+                            output_file.write(line + url + '\n')
+                        # print(str(i).replace('\n', ' '))
+            except Exception:
+                cnt -= 1
+                continue
+            finally:
+                cnt += 1
+                if cnt == 100:
+                    output_file.close()
+                    return
 
-# <a href="http://www.cttp.net.cn/list-13-1.html">关于我们</a>
-def getAbout(url, outputFile, rePattern):
-    try:
-        r = requests.get(url, timeout=(1,2))
-        html = r.text
-        res = rePattern[0].search(html)
-        if res:
-            target = res.group(1)
-            for ind, i in enumerate(rePattern[1:]):
-                cont = i.search(target)
-                if cont:
-                    if ind == 0:
-                        outputFile.write(cont.group())
-                    else:
-                        outputFile.write(url + '/' + cont.group() + '\n')
+                if ind % 20 == 0:
+                    print(ind)
+                    # exit()
+                if ind > 1000:
                     break
-            # outputFile.write('&&&' + url + ' ' + target + '\n')
-    except Exception as e:
-        # print(e)
-        pass
+    output_file.close()
+
 
 if __name__ == "__main__":
     main()

@@ -8,3 +8,49 @@
 # >>> from urllib.parse import quote
 # >>> quote('2019-04-13 NEWSworthy Clips.mp3')
 # '2019-04-13%20NEWSworthy%20Clips.mp3'
+
+from urllib.parse import quote
+from bs4 import BeautifulSoup
+import re, os, requests
+
+
+class Mp3Url(object):
+    def __init__(self, url):
+        self.url = url
+        self.html = requests.get(url).text
+        self.bs = BeautifulSoup(self.html, features='lxml')
+        self.resultList = self.bs.find_all('a')
+        self.list_ind = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.list_ind == len(self.resultList):
+            raise StopIteration
+        cur_str = str(self.resultList[self.list_ind])
+        self.list_ind += 1
+
+        res = re.search(r"\('(.*\.mp3)'\)", cur_str)
+        if res is None:
+            return self.__next__()
+        mp3 = res.group(1)
+        mp3_url = self.url + quote(mp3)
+        return mp3_url, mp3
+
+
+def main():
+    os.chdir(os.path.dirname(__file__))
+    if not os.path.exists('./mp3/'):
+        os.mkdir('./mp3/')
+    os.chdir('./mp3/')
+
+    for tp in Mp3Url('http://www.listeningexpress.com/studioclassroom/ad/'):
+        cur_url, file_name = tp
+        r = requests.get(cur_url)
+        with open('./'+file_name, 'wb') as f:
+            f.write(r.content)
+
+
+if __name__ == '__main__':
+    main()
