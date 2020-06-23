@@ -3,3 +3,6 @@
 /test.py
 /JackieX-python3-basic-study-master/*
 .idea/
+
+bbs-demo/venv/
+bbs-demo/__pycache__/
