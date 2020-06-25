@@ -6,3 +6,4 @@
 
 bbs-demo/venv/
 bbs-demo/__pycache__/
+bbs-demo/*/__pycache__/
